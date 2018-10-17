@@ -1,7 +1,8 @@
 var hangManArray = ["word", "something", "another", "great", "random", "butterfly", "kittycat"]; //words that the player will be guessing
-var hintArray = ["the basic structure of a sentance","not nothing","better than good","no specific pattern","in the sky, I can fly twice as high", "cute, soft, and dangerous"]; //holds hints
+var hintArray = ["the basic structure of a sentance","not nothing", "distinctly different","better than good","no specific pattern", "in the sky, I can fly twice as high", "cute, soft, and dangerous"]; //holds hints
 var dashStringArray = []; //will hold letters or dashes
 var usedLetterBank = []; //letters that have already been used
+let gameTimer = 60;
 var missedCount; //how many letters the user missed
 
 function randomWordGenerator(manArray){
@@ -13,6 +14,8 @@ function newGameGenerator(aWord){
 	dashStringArray = []; //initialize or re-initialize the game variables
 	missedCount = 0;
 	usedLetterBank = [];
+	timerCount=0;
+	console.log("inside new game generator"+aWord);
 	$("#used").html("None Yet!") //sets initial value of letters the player has already used.
 	for(let i = 0; i<aWord.length;i++){
 		dashString+="_ ";             //loops through the word to be guessed
@@ -40,6 +43,10 @@ $("#letterHolder").keypress(function (e){ //does the same thing as as above but 
 	}
 });
 
+$("#hintButton").click(function(){
+	$("#hint").html(hintArray[hangManArray.indexOf(newWord)]);	
+})
+
 function guesser(aLetter){ //the main portion of the programmer checks to see if the letter guessed 
 	let newDashString = ""; //re-initializes the string that will be dispayed on the html page
 	aLetter=aLetter.toLowerCase(); //converts the guess to lowercase
@@ -48,7 +55,7 @@ function guesser(aLetter){ //the main portion of the programmer checks to see if
 	} else if(aLetter.length>1){ //makes sure they have entered only one letter
 		window.alert("Please enter only one character.");
 	} else if(/[a-z]/.test(aLetter)===false) { //uses regular expression to see if is in fact a letter
-		if (aLetter==""||aLetter=" "){ // special case if they've entered nothing 
+		if (aLetter==""||aLetter==" "){ // special case if they've entered nothing 
 			aLetter="A blank entry"
 		}
 		window.alert(aLetter+" is not even a letter, how do you expect to win whilst typing tuch jibberish?!")
@@ -84,7 +91,17 @@ function guesser(aLetter){ //the main portion of the programmer checks to see if
 }
 /*Starts a new game*/
 function gameOver(winner, timeReason){ //first argument is for if the game was won or lost, second is for the reason why it was lost
-	
+	clearInterval(intervalID)
+	$('<div id="gameOver">text</div>').appendTo('body');
+	$("#gameOver").css({"height":"100px", "width":"300px", "background-color":"red", "border": "1px solid black", "border-radius": "10px"});
+	$('<input type="submit" id="newGame" value="New Game">').appendTo("#gameOver");
+	$("#newGame").click(function(){
+		newWord = randomWordGenerator(hangManArray);
+		console.log(newWord);
+		newGameGenerator(newWord);
+		intervalID = setInterval(addTimeHTML, 100);
+		$("#gameOver").remove();
+	});
 	if(winner===true){
 		console.log("winner winner chicken dinner.");
 	}
@@ -96,8 +113,27 @@ function gameOver(winner, timeReason){ //first argument is for if the game was w
 			console.log("you ran out of guesses.");
 		}
 	}
-	newWord = randomWordGenerator(hangManArray); //re-initializes the word being guessed
-	console.log(newWord); 
-	newGameGenerator(newWord); //re-initializes all the other processes needed for a new game
+}
+
+
+
+var intervalID = setInterval(addTimeHTML, 100);
+
+
+var timeStamp = new Date();
+
+var timerCount = 0;
+
+function addTimeHTML(){
+	if(timerCount===0){
+	 	timeStamp = new Date();
+	}
+	timerCount++;
+	newTime = new Date();
+	gameTimer = 60-Math.floor((newTime-timeStamp)/1000)
+	$("#timer").html(gameTimer);
+	if(gameTimer===0){
+		gameOver(false,true);
+	}
 }
 // console.log(newGameGenerator(randomWordGenerator(hangManArray)));
