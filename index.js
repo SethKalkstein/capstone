@@ -4,6 +4,13 @@ var dashStringArray = []; //will hold letters or dashes
 var usedLetterBank = []; //letters that have already been used
 let gameTimer = 60;
 var missedCount; //how many letters the user missed
+var intervalID = setInterval(addTimeHTML, 100);
+var timeStamp = new Date();
+var timerCount = 0;
+var gameCount = 1;
+var hintCount = false;
+var highScore = [];
+
 
 function randomWordGenerator(manArray){
 	return manArray[Math.floor(Math.random()*manArray.length)]; //uses random to pick a word from the hangManArray
@@ -15,7 +22,10 @@ function newGameGenerator(aWord){
 	missedCount = 0;
 	usedLetterBank = [];
 	timerCount=0;
-	console.log("inside new game generator"+aWord);
+	hintCount=false;
+	// enableButtons();
+	$("#hint").html("?");
+	console.log("inside new game generator: "+aWord);
 	$("#used").html("None Yet!") //sets initial value of letters the player has already used.
 	for(let i = 0; i<aWord.length;i++){
 		dashString+="_ ";             //loops through the word to be guessed
@@ -23,31 +33,12 @@ function newGameGenerator(aWord){
 	}
 	$("#missed").html(missedCount); //appends the 0 missed letters to the webpage
 	$("#wordHolder").html(dashString); //appends the initial dashes to the page
+	enableButtons();
 }
-
-let newWord = randomWordGenerator(hangManArray); //generates the first word
-console.log(newWord); 
-newGameGenerator(newWord); //generates everything else and resets the variables
-
-
-$("#guess").click(function(){  //event listener for the guess button
-	guesser($("#letterHolder").val()); //calls the guesser function and passes the value of the input box to the function 
-	$("#letterHolder").val(""); //and clears the letter input box
-});
-
-$("#letterHolder").keypress(function (e){ //does the same thing as as above but with the enter key while in the input box
-	var key = e.which; //
-    if(key == 13){
-		guesser($("#letterHolder").val());
-		$("#letterHolder").val("");
-	}
-});
-
-$("#hintButton").click(function(){
-	$("#hint").html(hintArray[hangManArray.indexOf(newWord)]);	
-})
-
+var guesserCount=0;
 function guesser(aLetter){ //the main portion of the programmer checks to see if the letter guessed 
+	console.log("guess count: "+guesserCount);
+	guesserCount++;
 	let newDashString = ""; //re-initializes the string that will be dispayed on the html page
 	aLetter=aLetter.toLowerCase(); //converts the guess to lowercase
 	if(usedLetterBank.indexOf(aLetter)!=-1){ //if the letter is already in the letter bank the index variable will not return -1
@@ -82,7 +73,7 @@ function guesser(aLetter){ //the main portion of the programmer checks to see if
 			$("#missed").html(missedCount); //and displays it
 		}	
 	}
-	if(missedCount===5){ //5 missed guesses and you loose!!!
+	if(missedCount===6){ //6 missed guesses and you loose!!!
 		gameOver(false,false); 
 	}
 	if(dashStringArray.indexOf("_")===-1){ //if there are no more dashes in the array, then it means the word has been guessed
@@ -91,9 +82,31 @@ function guesser(aLetter){ //the main portion of the programmer checks to see if
 }
 /*Starts a new game*/
 function gameOver(winner, timeReason){ //first argument is for if the game was won or lost, second is for the reason why it was lost
-	clearInterval(intervalID)
-	$('<div id="gameOver">text</div>').appendTo('body');
-	$("#gameOver").css({"height":"100px", "width":"300px", "background-color":"red", "border": "1px solid black", "border-radius": "10px"});
+	clearInterval(intervalID); //stop timer
+	disableButtons(); //disable game buttons
+	$('<div id="gameOver"></div>').appendTo('body'); //create modal
+	$("#gameOver").css({"height":"200px", "width":"300px", "background-color":"red", "border": "1px solid black", "border-radius": "10px"}); //set modal css
+	$('<p id="overMessage"></p>').appendTo("#gameOver");
+	let hintText="";
+	if(hintCount===false){ //sets text for if they used a hint{
+		hintText="out";
+	} else{
+		hintText="";
+	}
+	if(winner===true){
+		$("#overMessage").text("You won! "+"You finsished in "+(60-gameTimer)+" seconds, with "+usedLetterBank.length+" turns total, and missed "+missedCount+" times, with"+hintText+" using a hint. Your score is: "+scoreGen(winner));
+	}
+	else{
+		if(timeReason===true){
+		$("#overMessage").text("You loose. You ran out of time. You finsished in "+(60-gameTimer)+" seconds, with "+usedLetterBank.length+" turns total, and missed "+missedCount+" times, with"+hintText+" using a hint. Your score is: "+scoreGen(winner));
+			console.log("you ran out of time.\nThe word was "+newWord);
+		}
+		else{
+			$("#overMessage").text("You loose. You got too many wrong. You finsished in "+(60-gameTimer)+" seconds, with "+usedLetterBank.length+" turns total, and missed "+missedCount+" times, with"+hintText+" using a hint. Your score is: "+scoreGen(winner));
+			console.log("you ran out of guesses.");
+		}
+	}
+	scoreBoard(winner);
 	$('<input type="submit" id="newGame" value="New Game">').appendTo("#gameOver");
 	$("#newGame").click(function(){
 		newWord = randomWordGenerator(hangManArray);
@@ -102,27 +115,27 @@ function gameOver(winner, timeReason){ //first argument is for if the game was w
 		intervalID = setInterval(addTimeHTML, 100);
 		$("#gameOver").remove();
 	});
-	if(winner===true){
-		console.log("winner winner chicken dinner.");
-	}
-	else{
-		if(timeReason===true){
-			console.log("you ran out of time.\nThe word was "+newWord);
-		}
-		else{
-			console.log("you ran out of guesses.");
-		}
-	}
 }
-
-
-
-var intervalID = setInterval(addTimeHTML, 100);
-
-
-var timeStamp = new Date();
-
-var timerCount = 0;
+//lowest winning score starts at 90, highest losing score is a little below 90 depending on the percent of dashes there are left to total length of the word, which becomes a percent of 60, which coincides with what 6 wrong guesses would give you... each wrong guess on a winning game get 10 points subtracted from the score. time on the clock is added to a winners score. Using a hint will subtract 30 from your score whether you win or loose.
+function scoreGen(winner){ //generates a score
+	let hintScore = 0;
+	let score = 0; //initialize score
+	let dashCount = 0;
+	if(hintCount===true){
+		hintScore=30;
+	}
+	if(winner===true){
+		score = gameTimer + 170 - (missedCount*10 + hintScore) ;
+	}else{
+		for(let i =0;i<dashStringArray.length;i++){
+			if(dashStringArray[i]==="_"){
+				dashCount++;
+			}
+		}
+		score = 90 - (Math.floor((dashCount/dashStringArray.length)*60) + hintScore);
+	}
+	return score;
+}
 
 function addTimeHTML(){
 	if(timerCount===0){
@@ -137,3 +150,63 @@ function addTimeHTML(){
 	}
 }
 // console.log(newGameGenerator(randomWordGenerator(hangManArray)));
+function enableButtons(){
+	// let key = 0;
+	console.log("enabling");
+	// $("#guess").on("click");
+	$("#guess").click(function(){  //event listener for the guess button
+		guesser($("#letterHolder").val()); //calls the guesser function and passes the value of the input box to the function 
+		$("#letterHolder").val(""); //and clears the letter input box
+	});
+	$("#letterHolder").removeAttr("disabled");
+	if(gameCount===1){
+		$("#letterHolder").keypress(function (enterButton){ //does the same thing as as above but with the enter key while in the input box
+			var key = enterButton.which; //
+		    if(key === 13){
+		    	console.log("enter meow");
+				guesser($("#letterHolder").val());
+				$("#letterHolder").val("");
+				// $("#letterHolder").val("");
+				// $("#letterHolder").attr("maxlength","15");
+			}
+		});
+	}
+	$("#hintButton").click(function(){
+		$("#hint").html(hintArray[hangManArray.indexOf(newWord)]);
+		hintCount=true;	
+	})
+	gameCount++;
+}
+
+function disableButtons(){
+	console.log("disabling");
+	$("#guess").off("click");
+	$("#letterHolder").attr("disabled",true);
+	$("#hintButton").off("click");
+}
+
+var sampleArray = [{name: "bill",score:10, win: false},{name: "jill",score:30, win: false},{name: "will",score:70, win: false},{name: "phill",score:90, win: false},{name: "gill",score:50, win: false}];
+
+function objectSort(tbs){ //arg is an an array of objects to be sorted (t.b.s)
+    var holder1 = {}; //will hold the objects to be switched
+    var holder2 = {}; //other holder
+    for(var i=0;i<tbs.length-1;i++){
+        for(let j = 0; j<tbs.length-(i+1);j++){
+        	console.log("tbsj "+tbs[j]+" tbsj+1 "+tbs[j+1]+" i "+i+" j "+j);
+            if(tbs[j].score<tbs[j+1].score){
+                holder1=tbs[j];
+                holder2=tbs[j+1]
+                tbs[j]=holder2;
+                tbs[j+1]=holder1;
+            }
+        }
+    }
+    return tbs;
+}
+
+
+
+let newWord = randomWordGenerator(hangManArray); //generates the first word
+console.log(newWord); 
+newGameGenerator(newWord); //generates everything else and resets the variables
+// enableButtons();
