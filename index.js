@@ -4,10 +4,9 @@ var dashStringArray = []; //will hold letters or dashes
 var usedLetterBank = []; //letters that have already been used
 let gameTimer = 60;
 var missedCount; //how many letters the user missed
-var intervalID = setInterval(addTimeHTML, 100);
 var timeStamp = new Date();
 var timerCount = 0;
-var gameCount = 1;
+var gameCount = 0;
 var hintCount = false;
 var highScore = [];
 
@@ -23,6 +22,7 @@ function newGameGenerator(aWord){
 	usedLetterBank = [];
 	timerCount=0;
 	hintCount=false;
+	intervalID = setInterval(addTimeHTML, 100);
 	// enableButtons();
 	$("#hint").html("?");
 	console.log("inside new game generator: "+aWord);
@@ -111,8 +111,8 @@ function gameOver(winner, timeReason){ //first argument is for if the game was w
 	$("#newGame").click(function(){
 		newWord = randomWordGenerator(hangManArray);
 		console.log(newWord);
+		// grabHigh();
 		newGameGenerator(newWord);
-		intervalID = setInterval(addTimeHTML, 100);
 		$("#gameOver").remove();
 	});
 }
@@ -125,7 +125,7 @@ function scoreGen(winner){ //generates a score
 		hintScore=30;
 	}
 	if(winner===true){
-		score = gameTimer + 170 - (missedCount*10 + hintScore) ;
+		score = gameTimer + 170 - (missedCount*10 + hintScore);
 	}else{
 		for(let i =0;i<dashStringArray.length;i++){
 			if(dashStringArray[i]==="_"){
@@ -135,6 +135,24 @@ function scoreGen(winner){ //generates a score
 		score = 90 - (Math.floor((dashCount/dashStringArray.length)*60) + hintScore);
 	}
 	return score;
+}
+
+function scoreBoard(winner) {
+	$("<p id='highMessage'></p>").appendTo("#gameOver");
+	if(gameCount<=3){ //score board has top 3 contenders so you automatically go in if you're one of the first 3 players
+		$("#gameOver").css({"height":"300px"});
+		if(gameCount==1){ //if they're the first player to finish
+
+			$("#highMessage").text("You're the first person to play, so by default, you have the high score. Please enter your name!")
+				$('<input type="text" id="scoreHolder" maxlength="16" placeholder="enter name here:">').appendTo("#gameOver");
+		}
+		else{ //if they're not the first to finish
+
+		}
+	}
+	else{
+
+	}
 }
 
 function addTimeHTML(){
@@ -149,25 +167,21 @@ function addTimeHTML(){
 		gameOver(false,true);
 	}
 }
-// console.log(newGameGenerator(randomWordGenerator(hangManArray)));
+
 function enableButtons(){
-	// let key = 0;
 	console.log("enabling");
-	// $("#guess").on("click");
 	$("#guess").click(function(){  //event listener for the guess button
 		guesser($("#letterHolder").val()); //calls the guesser function and passes the value of the input box to the function 
 		$("#letterHolder").val(""); //and clears the letter input box
 	});
 	$("#letterHolder").removeAttr("disabled");
-	if(gameCount===1){
+	if(gameCount===0){
 		$("#letterHolder").keypress(function (enterButton){ //does the same thing as as above but with the enter key while in the input box
 			var key = enterButton.which; //
 		    if(key === 13){
 		    	console.log("enter meow");
 				guesser($("#letterHolder").val());
 				$("#letterHolder").val("");
-				// $("#letterHolder").val("");
-				// $("#letterHolder").attr("maxlength","15");
 			}
 		});
 	}
