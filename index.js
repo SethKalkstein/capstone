@@ -35,7 +35,9 @@ function newGameGenerator(aWord){
 	$("#wordHolder").html(dashString); //appends the initial dashes to the page
 	enableButtons();
 }
+
 var guesserCount=0;
+
 function guesser(aLetter){ //the main portion of the programmer checks to see if the letter guessed 
 	console.log("guess count: "+guesserCount);
 	guesserCount++;
@@ -84,6 +86,7 @@ function guesser(aLetter){ //the main portion of the programmer checks to see if
 function gameOver(winner, timeReason){ //first argument is for if the game was won or lost, second is for the reason why it was lost
 	clearInterval(intervalID); //stop timer
 	disableButtons(); //disable game buttons
+	var finalScore = scoreGen(winner);
 	$('<div id="gameOver"></div>').appendTo('body'); //create modal
 	$("#gameOver").css({"height":"200px", "width":"300px", "background-color":"red", "border": "1px solid black", "border-radius": "10px"}); //set modal css
 	$('<p id="overMessage"></p>').appendTo("#gameOver");
@@ -94,25 +97,26 @@ function gameOver(winner, timeReason){ //first argument is for if the game was w
 		hintText="";
 	}
 	if(winner===true){
-		$("#overMessage").text("You won! "+"You finsished in "+(60-gameTimer)+" seconds, with "+usedLetterBank.length+" turns total, and missed "+missedCount+" times, with"+hintText+" using a hint. Your score is: "+scoreGen(winner));
+		$("#overMessage").text("You won! "+"You finsished in "+(60-gameTimer)+" seconds, with "+usedLetterBank.length+" turns total, and missed "+missedCount+" times, with"+hintText+" using a hint. Your score is: "+finalScore);
 	}
 	else{
 		if(timeReason===true){
-		$("#overMessage").text("You loose. You ran out of time. You finsished in "+(60-gameTimer)+" seconds, with "+usedLetterBank.length+" turns total, and missed "+missedCount+" times, with"+hintText+" using a hint. Your score is: "+scoreGen(winner));
+		$("#overMessage").text("You loose. You ran out of time. You finsished in "+(60-gameTimer)+" seconds, with "+usedLetterBank.length+" turns total, and missed "+missedCount+" times, with"+hintText+" using a hint. Your score is: "+finalScore);
 			console.log("you ran out of time.\nThe word was "+newWord);
 		}
 		else{
-			$("#overMessage").text("You loose. You got too many wrong. You finsished in "+(60-gameTimer)+" seconds, with "+usedLetterBank.length+" turns total, and missed "+missedCount+" times, with"+hintText+" using a hint. Your score is: "+scoreGen(winner));
+			$("#overMessage").text("You loose. You got too many wrong. You finsished in "+(60-gameTimer)+" seconds, with "+usedLetterBank.length+" turns total, and missed "+missedCount+" times, with"+hintText+" using a hint. Your score is: "+finalScore);
 			console.log("you ran out of guesses.");
 		}
 	}
-	scoreBoard(winner);
-	$('<input type="submit" id="newGame" value="New Game">').appendTo("#gameOver");
+	let scoreResult = scoreBoard(winner, finalScore); //finds out if it was a top score in the scoreboard function
+	$('<input type="submit" id="newGame" value="New Game">').appendTo("#gameOver"); //creates a button to start a new game
 	$("#newGame").click(function(){
-		newWord = randomWordGenerator(hangManArray);
+		newWord = randomWordGenerator(hangManArray); //generates the new word.
 		console.log(newWord);
-		// grabHigh();
+		grabName(scoreResult, finalScore, winner); //will gran a high score name depending on the state of scoreResult
 		newGameGenerator(newWord);
+		// $("#scoreHolder").remove();
 		$("#gameOver").remove();
 	});
 }
@@ -137,23 +141,47 @@ function scoreGen(winner){ //generates a score
 	return score;
 }
 
-function scoreBoard(winner) {
+function scoreBoard(winner, finalScore) { //decides whether of not thier name goes on the score board
 	$("<p id='highMessage'></p>").appendTo("#gameOver");
+	console.log(finalScore);
 	if(gameCount<=3){ //score board has top 3 contenders so you automatically go in if you're one of the first 3 players
 		$("#gameOver").css({"height":"300px"});
 		if(gameCount==1){ //if they're the first player to finish
-
-			$("#highMessage").text("You're the first person to play, so by default, you have the high score. Please enter your name!")
-				$('<input type="text" id="scoreHolder" maxlength="16" placeholder="enter name here:">').appendTo("#gameOver");
+			$("#highMessage").text("You're the first person to play, so by default, you have the high score. (and also the low score) Please enter your name!");
 		}
-		else{ //if they're not the first to finish
-
+		else{ //if they're not the first to finish, but still first 3
+			if(finalScore>highScore[0].score){
+				$("#highMessage").text("Congratulations! You have the new high score!!!! Please enter your name!");
+			} else if(gameCount===2){
+				$("#highMessage").text("You're the second person to play, so by default, you're in the top 3. (but last if you think about it) Please enter your name!");
+			} else if(finalScore>highScore[1].score){
+				$("#highMessage").text("You automatically get on the scoreboard because you're only the thrd to play but you got second place. Please enter your name!");
+			} else {
+				$("#highMessage").text("You're the third person to play, so by default, you're in the top 3, but you're also in last place... Please enter your name, anyway!");
+			}
 		}
+		$('<input type="text" id="scoreHolder" maxlength="16" placeholder="enter name here:">').appendTo("#gameOver");
+		return true;
 	}
-	else{
+	else if(finalScore>highScore[2]){
 
 	}
 }
+
+function grabName(newScore, scoreResult, winner){
+	if(newScore===true){
+		if(highScore.length===3){
+			highScore.splice(2,1); //get rid of the third element
+		}
+		highScore.push({name: $("#scoreHolder").val(), score: scoreResult, win: winner});
+		console.log($("#scoreHolder").val());
+	}
+	if(highScore.length>1){
+		highScore=objectSort(highScore);
+	}
+	console.log(highScore);
+}
+
 
 function addTimeHTML(){
 	if(timerCount===0){
@@ -179,7 +207,6 @@ function enableButtons(){
 		$("#letterHolder").keypress(function (enterButton){ //does the same thing as as above but with the enter key while in the input box
 			var key = enterButton.which; //
 		    if(key === 13){
-		    	console.log("enter meow");
 				guesser($("#letterHolder").val());
 				$("#letterHolder").val("");
 			}
