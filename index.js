@@ -96,16 +96,20 @@ function gameOver(winner, timeReason){ //first argument is for if the game was w
 	} else{
 		hintText="";
 	}
+	let missedS = "s";
+	if(missedCount===1){
+		missedS="";
+	}
 	if(winner===true){
-		$("#overMessage").text("You won! "+"You finsished in "+(60-gameTimer)+" seconds, with "+usedLetterBank.length+" turns total, and missed "+missedCount+" times, with"+hintText+" using a hint. Your score is: "+finalScore);
+		$("#overMessage").text("You won! "+"You finsished in "+(60-gameTimer)+" seconds, with "+usedLetterBank.length+" turns total, and missed "+missedCount+" time"+missedS+", with"+hintText+" using a hint. Your score is: "+finalScore);
 	}
 	else{
 		if(timeReason===true){
-		$("#overMessage").text("You loose. You ran out of time. You finsished in "+(60-gameTimer)+" seconds, with "+usedLetterBank.length+" turns total, and missed "+missedCount+" times, with"+hintText+" using a hint. Your score is: "+finalScore);
+		$("#overMessage").text("You loose. You ran out of time. You finsished in "+(60-gameTimer)+" seconds, with "+usedLetterBank.length+" turns total, and missed "+missedCount+" time"+missedS+", with"+hintText+" using a hint. Your score is: "+finalScore);
 			console.log("you ran out of time.\nThe word was "+newWord);
 		}
 		else{
-			$("#overMessage").text("You loose. You got too many wrong. You finsished in "+(60-gameTimer)+" seconds, with "+usedLetterBank.length+" turns total, and missed "+missedCount+" times, with"+hintText+" using a hint. Your score is: "+finalScore);
+			$("#overMessage").text("You loose. You got too many wrong. You finsished in "+(60-gameTimer)+" seconds, with "+usedLetterBank.length+" turns total, and missed "+missedCount+" time"+missedS+", with"+hintText+" using a hint. Your score is: "+finalScore);
 			console.log("you ran out of guesses.");
 		}
 	}
@@ -163,21 +167,50 @@ function scoreBoard(winner, finalScore) { //decides whether of not thier name go
 		$('<input type="text" id="scoreHolder" maxlength="16" placeholder="enter name here:">').appendTo("#gameOver");
 		return true;
 	}
-	else if(finalScore>highScore[2]){
-
+	else if(finalScore>highScore[2].score){
+		$("#gameOver").css({"height":"300px"});
+		if(finalScore>highScore[0].score){
+			$("#highMessage").text("Congratulations! You have the new high score!!!! Please enter your name!");
+		} else if (finalScore>highScore[1].score){
+			$("#highMessage").text("Congratulations! You made it to second place. Please enter your name!");
+		} else {
+			$("#highMessage").text("Congratulations! You made it to third place. Please enter your name!");
+		}
+		$('<input type="text" id="scoreHolder" maxlength="16" placeholder="enter name here:">').appendTo("#gameOver");
+		return true;
+	}
+	else{
+		return false;
 	}
 }
 
 function grabName(newScore, scoreResult, winner){
-	if(newScore===true){
+	if(newScore===true){ //its a new high score
 		if(highScore.length===3){
 			highScore.splice(2,1); //get rid of the third element
 		}
 		highScore.push({name: $("#scoreHolder").val(), score: scoreResult, win: winner});
 		console.log($("#scoreHolder").val());
+		if(highScore.length>1){
+			highScore=objectSort(highScore);
+		}
+		$(".highPlayers").html("");
+		for(let i =0;i<highScore.length;i++){
+			let winLoss="Winner";
+			if(highScore[i].win===false){
+				winLoss="Loser"
+			}
+			// $(".highPlayers").eq(i).html("<td>Moew</td><td>Purr</td><td>hiss</td>");
+			$(".highPlayers").eq(i).html("<td>"+highScore[i].score+"</td><td>"+highScore[i].name+"</td><td>"+winLoss+"</td>");
+			// $(".highPlayers:eq(i)").html("Hello");
+			console.log("appending");
+		}
 	}
-	if(highScore.length>1){
-		highScore=objectSort(highScore);
+
+		
+
+	for(let i=0;i<highScore.length-1;i++){
+
 	}
 	console.log(highScore);
 }
@@ -225,8 +258,6 @@ function disableButtons(){
 	$("#letterHolder").attr("disabled",true);
 	$("#hintButton").off("click");
 }
-
-var sampleArray = [{name: "bill",score:10, win: false},{name: "jill",score:30, win: false},{name: "will",score:70, win: false},{name: "phill",score:90, win: false},{name: "gill",score:50, win: false}];
 
 function objectSort(tbs){ //arg is an an array of objects to be sorted (t.b.s)
     var holder1 = {}; //will hold the objects to be switched
