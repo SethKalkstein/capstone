@@ -118,7 +118,7 @@ function gameOver(winner, timeReason){ //first argument is for if the game was w
 	$("#newGame").click(function(){
 		newWord = randomWordGenerator(hangManArray); //generates the new word.
 		console.log(newWord);
-		grabName(scoreResult, finalScore, winner); //will gran a high score name depending on the state of scoreResult
+		grabName(scoreResult, finalScore, winner); //will grab a high score name depending on the state of scoreResult
 		newGameGenerator(newWord);
 		// $("#scoreHolder").remove();
 		$("#gameOver").remove();
@@ -184,6 +184,7 @@ function scoreBoard(winner, finalScore) { //decides whether of not thier name go
 	}
 }
 
+//This function sets the information of player who make it to the high score board. Parameters are newScore (int), scroreResult
 function grabName(newScore, scoreResult, winner){
 	if(newScore===true){ //its a new high score
 		if(highScore.length===3){
@@ -206,17 +207,12 @@ function grabName(newScore, scoreResult, winner){
 			console.log("appending");
 		}
 	}
-
-		
-
-	for(let i=0;i<highScore.length-1;i++){
-
-	}
 	console.log(highScore);
 }
 
 
 function addTimeHTML(){
+	// var timeStamp = new Date();
 	if(timerCount===0){
 	 	timeStamp = new Date();
 	}
