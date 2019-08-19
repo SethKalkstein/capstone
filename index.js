@@ -12,9 +12,9 @@ var missedCount;
 var timeStamp = new Date();
 var timerCount = 0;
 var gameCount = 0;
-var hintCount = false;
+var hintUsed = false;
 var highScore = [];
-
+var guesserCount = 0;
 
 function randomWordGenerator(manArray) {
 	//uses random to pick a word from the hangManArray
@@ -25,12 +25,12 @@ function newGameGenerator(aWord) {
 
 	let dashString = "";
 	
-	//initialize or re-initialize the global game variables
+	//re-initialize the global game variables
 	dashStringArray = []; 
 	missedCount = 0;
 	usedLetterBank = [];
 	timerCount = 0;
-	hintCount = false;
+	hintUsed = false;
 	intervalID = setInterval(addTimeHTML, 100);
 
 	//set hint text to "?"... oooh the intigue
@@ -54,17 +54,62 @@ function newGameGenerator(aWord) {
 	enableButtons();
 }
 
-// why is this here instead of the top?
-var guesserCount = 0;
+function enableButtons() {
 
-//the main portion of the program. Checks to see if the letter guessed 
+	console.log("enabling");
+	//event listener for the guess button
+	$("#guess").click(function () { 
+		//calls the guesser function and passes the value of the input box to the function 
+		guesser($("#letterHolder").val()); 
+		$("#letterHolder").val(""); //and clears the letter input box
+	});
+
+	$("#letterHolder").removeAttr("disabled");
+
+	if (gameCount === 0) {
+		//does the same thing as as above but with the enter key while in the input box
+		$("#letterHolder").keypress(function (enterButton) { 
+			var key = enterButton.which;
+
+			if (key === 13) {
+				guesser($("#letterHolder").val());
+				$("#letterHolder").val("");
+			}
+		});
+	}
+
+	$("#hintButton").click(function () {		
+		$("#hint").html(hintArray[hangManArray.indexOf(newWord)]);
+		hintUsed = true;
+	})
+
+	gameCount++;
+}
+
+/**
+ * Function guesser:  
+ * the main portion of the program. Checks to see if the letter guessed is correct
+ *
+ * parameter: (aLetter) is taken in from keyboard input which was activated with a
+ * jquery .click or .keypress event in the enableButtons function. It can be Any 
+ * user input and will be error checked to make sure it is a valid letter.
+ *
+ * also checks to see if the game is over and whether or not the user won
+ *
+ * no return value
+ * changes global variables for guess count 
+ */
+
+
 function guesser(aLetter) { 
-
+	//re-initializes the string that will be appended to the html 
+	let usedLetters = "";
 	console.log("guess count: " + guesserCount);
-	
-	guesserCount++;
-	//re-initializes the string that will be dispayed on the html page
-	let newDashString = ""; 
+		//re-initializes the string that will be dispayed on the html page
+		let newDashString = "";
+		//is guesserCount used?
+		guesserCount++;
+ 
 	//converts the guess to lowercase
 	aLetter = aLetter.toLowerCase(); 
 
@@ -94,7 +139,7 @@ function guesser(aLetter) {
 		//sorts the used letters 
 		usedLetterBank.sort();
 		//re-initializes the string that will be appended to the html 
-		let usedLetters = ""; 
+		// let usedLetters = ""; 
 
 		//formats the used letterbank
 		for (let i = 0; i < usedLetterBank.length; i++) {
@@ -159,7 +204,7 @@ function gameOver(winner, timeReason) {
 	// why is declaration here?
 	let hintText = "";
 	//sets text for if they used a hint{
-	if (hintCount === false) { 
+	if (hintUsed === false) { 
 		hintText = "out";
 	} else {
 		hintText = "";
@@ -204,7 +249,7 @@ function scoreGen(winner) {
 	let score = 0; 
 	let dashCount = 0;
 
-	if (hintCount === true) {
+	if (hintUsed === true) {
 		hintScore = 30;
 	}
 	if (winner === true) {
@@ -316,37 +361,7 @@ function addTimeHTML() {
 	}
 }
 
-function enableButtons() {
 
-	console.log("enabling");
-	//event listener for the guess button
-	$("#guess").click(function () { 
-		//calls the guesser function and passes the value of the input box to the function 
-		guesser($("#letterHolder").val()); 
-		$("#letterHolder").val(""); //and clears the letter input box
-	});
-
-	$("#letterHolder").removeAttr("disabled");
-
-	if (gameCount === 0) {
-		//does the same thing as as above but with the enter key while in the input box
-		$("#letterHolder").keypress(function (enterButton) { 
-			var key = enterButton.which;
-
-			if (key === 13) {
-				guesser($("#letterHolder").val());
-				$("#letterHolder").val("");
-			}
-		});
-	}
-
-	$("#hintButton").click(function () {		
-		$("#hint").html(hintArray[hangManArray.indexOf(newWord)]);
-		hintCount = true;
-	})
-
-	gameCount++;
-}
 
 function disableButtons() {
 
@@ -380,7 +395,7 @@ function objectSort(tbs) {
 //generates the first word (down here becuase of hoisting?)
 let newWord = randomWordGenerator(hangManArray); 
 
-console.log(newWord);
+// console.log(newWord);
 //generates everything else and resets the variables
 newGameGenerator(newWord); 
 // enableButtons();
