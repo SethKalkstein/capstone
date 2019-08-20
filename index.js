@@ -14,7 +14,7 @@ var timerCount = 0;
 var gameCount = 0;
 var hintUsed = false;
 var highScore = [];
-var guesserCount = 0;
+// var guesserCount = 0;
 
 function randomWordGenerator(manArray) {
 	//uses random to pick a word from the hangManArray
@@ -103,12 +103,9 @@ function enableButtons() {
 
 function guesser(aLetter) { 
 	//re-initializes the string that will be appended to the html 
-	let usedLetters = "";
-	console.log("guess count: " + guesserCount);
-		//re-initializes the string that will be dispayed on the html page
-		let newDashString = "";
-		//is guesserCount used?
-		guesserCount++;
+	let usedLetters = " | ";
+	//re-initializes the string that will be dispayed on the html page
+	let newDashString = "";
  
 	//converts the guess to lowercase
 	aLetter = aLetter.toLowerCase(); 
@@ -128,18 +125,14 @@ function guesser(aLetter) {
 		}
 		window.alert(aLetter + " is not even a letter, how do you expect to win whilst typing tuch jibberish?!")
 	}
-	//its an acual letter that hasn't been guessed yet.
+	//else means it's an acual letter that hasn't been guessed yet.
 	else { 
-
-		console.log("do stuff");
 		//default for a wrong guess
 		let missedFlag = true; 
 		//stores the letter in the array of used letters
 		usedLetterBank.push(aLetter);
 		//sorts the used letters 
 		usedLetterBank.sort();
-		//re-initializes the string that will be appended to the html 
-		// let usedLetters = ""; 
 
 		//formats the used letterbank
 		for (let i = 0; i < usedLetterBank.length; i++) {
@@ -170,7 +163,7 @@ function guesser(aLetter) {
 		}
 	}
 
-	//6 missed guesses and you loose!!!
+	//6 missed guesses and you loose!!! (or change the if condition to whatever number of misses you want)
 	if (missedCount === 6) { 
 		gameOver(false, false);
 	}
@@ -181,14 +174,34 @@ function guesser(aLetter) {
 	}
 }
 
-//Starts a new game first argument is for if the game was won or lost, second is for the reason why it was lost
-function gameOver(winner, timeReason) { 
+/**
+ * Starts a new game
+ * 
+ * Paramers determine is it was a win or a loss, and if it was a loss,
+ * was it due to time up.
+ * 
+ * @param {boolean} winner 
+ * @param {boolean} timeUpLoss 
+ */
+
+function gameOver(winner, timeUpLoss) { 
+	
+	// initialize function variables
+
+	//grammar helper
+	let gameOverMessageHintGrammar = "";
+	//grammar helper
+	let gameOverMessageMissedTimesGrammar = "s";
+	//grab final score
+	var finalScore = scoreGen(winner);
+
+	// stop or disable main functionality
+
 	//stop timer
 	clearInterval(intervalID);
 	//disable game buttons 
 	disableButtons(); 
-	//why is this being declared here?
-	var finalScore = scoreGen(winner);
+
 	//create modal
 	$('<div id="gameOver"></div>').appendTo('body'); 
 	//set modal css
@@ -199,31 +212,30 @@ function gameOver(winner, timeReason) {
 		"border": "1px solid black",
 		"border-radius": "10px"
 	}); 
-
+	//create html element to hold the game over message
 	$('<p id="overMessage"></p>').appendTo("#gameOver");
-	// why is declaration here?
-	let hintText = "";
-	//sets text for if they used a hint{
-	if (hintUsed === false) { 
-		hintText = "out";
-	} else {
-		hintText = "";
-	}
 
-	//what does the next 4 lines do?
-	let missedS = "s";
+	//conditionals for setting grammar
+
+	//sets message text grammer "with" using a hint vs "without" using a hint
+	if (hintUsed === false) { 
+		gameOverMessageHintGrammar = "out";
+	} else {
+		gameOverMessageHintGrammar = "";
+	}
+	//gameOverMessageMissedTimesGrammar provides proper grammer for the word time(). 1 time vs 2 time(s) or 0 time(s)
 	if (missedCount === 1) {
-		missedS = "";
+		gameOverMessageMissedTimesGrammar = "";
 	}
 
 	if (winner === true) {
-		$("#overMessage").text("You won! " + "You finsished in " + (60 - gameTimer) + " seconds, with " + usedLetterBank.length + " turns total, and missed " + missedCount + " time" + missedS + ", with" + hintText + " using a hint. Your score is: " + finalScore);
+		$("#overMessage").text("You won! " + "You finsished in " + (60 - gameTimer) + " seconds, with " + usedLetterBank.length + " turns total, and missed " + missedCount + " time" + gameOverMessageMissedTimesGrammar + ", with" + gameOverMessageHintGrammar + " using a hint. Your score is: " + finalScore);
 	} else {
-		if (timeReason === true) {
-			$("#overMessage").text("You loose. You ran out of time. You finsished in " + (60 - gameTimer) + " seconds, with " + usedLetterBank.length + " turns total, and missed " + missedCount + " time" + missedS + ", with" + hintText + " using a hint. Your score is: " + finalScore);
+		if (timeUpLoss === true) {
+			$("#overMessage").text("You loose. You ran out of time. You finsished in " + (60 - gameTimer) + " seconds, with " + usedLetterBank.length + " turns total, and missed " + missedCount + " time" + gameOverMessageMissedTimesGrammar + ", with" + gameOverMessageHintGrammar + " using a hint. Your score is: " + finalScore);
 			console.log("you ran out of time.\nThe word was " + newWord);
 		} else {
-			$("#overMessage").text("You loose. You got too many wrong. You finsished in " + (60 - gameTimer) + " seconds, with " + usedLetterBank.length + " turns total, and missed " + missedCount + " time" + missedS + ", with" + hintText + " using a hint. Your score is: " + finalScore);
+			$("#overMessage").text("You loose. You got too many wrong. You finsished in " + (60 - gameTimer) + " seconds, with " + usedLetterBank.length + " turns total, and missed " + missedCount + " time" + gameOverMessageMissedTimesGrammar + ", with" + gameOverMessageHintGrammar + " using a hint. Your score is: " + finalScore);
 			console.log("you ran out of guesses.");
 		}
 	}
