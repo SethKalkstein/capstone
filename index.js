@@ -1,7 +1,7 @@
 //words that the player will be guessing
-var hangManArray = ["word", "something", "another", "great", "random", "butterfly", "kittycat"];
+const hangManArray = ["mother", "word", "something", "another", "great", "random", "butterfly", "kittycat"];
 //variable to hold hints
-var hintArray = ["the basic structure of a sentance", "not nothing", "distinctly different", "better than good", "no specific pattern", "in the sky, I can fly twice as high", "cute, soft, and dangerous"];
+const hintArray = ["withour her you wouldn't be here","the basic structure of a sentance", "not nothing", "distinctly different", "better than good", "no specific pattern", "in the sky, I can fly twice as high", "cute, soft, and dangerous"];
 //will hold letters or dashes
 var dashStringArray = [];
 //letters that have already been used 
@@ -10,33 +10,48 @@ let gameTimer = 60;
 //how many letters the user missed
 var missedCount; 
 var timeStamp = new Date();
-var timerCount = 0;
+var clockIsRunning = false;
 var gameCount = 0;
 var hintUsed = false;
 var highScore = [];
-// var guesserCount = 0;
 
+/**
+ * generates a random word from the hangman word array and returns it
+ * 
+ * @param {string[]} manArray 
+ * @returns {string}
+ * 
+ */
 function randomWordGenerator(manArray) {
 	//uses random to pick a word from the hangManArray
 	return manArray[Math.floor(Math.random() * manArray.length)]; 
 }
 
+/**
+ *  initializes a new game
+ * 
+ * @param {string} aWord 
+ * 
+ * aword is the word generated from the random randomWordGenerator
+ * 
+ * Resets a bunch of the global variables for a new round of the game
+ * Resets the timer and enables the buttons/main-functionality 
+ */
 function newGameGenerator(aWord) {
-
+	// dashString hold the string of dashes that will apear on the screen. These dashes are placeholders for the letters to be guessed
 	let dashString = "";
 	
 	//re-initialize the global game variables
 	dashStringArray = []; 
 	missedCount = 0;
 	usedLetterBank = [];
-	timerCount = 0;
 	hintUsed = false;
+	//sets the interval to calculate the time on the game clock every tenth of a second (100 miliseconds)
 	intervalID = setInterval(addTimeHTML, 100);
 
 	//set hint text to "?"... oooh the intigue
 	$("#hint").html("?");
 
-	console.log("inside new game generator: " + aWord);
 	//sets initial value of letters the player has already used.
 	$("#used").html("None Yet!") 
 	
@@ -52,6 +67,21 @@ function newGameGenerator(aWord) {
 	$("#wordHolder").html(dashString); 
 
 	enableButtons();
+}
+
+function addTimeHTML() {
+	
+	if (clockIsRunning === false) {
+		timeStamp = new Date();
+		clockIsRunning = true;
+	}
+
+	newTime = new Date();
+	gameTimer = 10 - Math.floor((newTime - timeStamp) / 1000)
+	$("#timer").html(gameTimer);
+	if (gameTimer === 0) {
+		gameOver(false, true);
+	}
 }
 
 function enableButtons() {
@@ -90,6 +120,8 @@ function enableButtons() {
  * Function guesser:  
  * the main portion of the program. Checks to see if the letter guessed is correct
  *
+ * @param {string} aLetter 
+ * 
  * parameter: (aLetter) is taken in from keyboard input which was activated with a
  * jquery .click or .keypress event in the enableButtons function. It can be Any 
  * user input and will be error checked to make sure it is a valid letter.
@@ -106,6 +138,8 @@ function guesser(aLetter) {
 	let usedLetters = " | ";
 	//re-initializes the string that will be dispayed on the html page
 	let newDashString = "";
+	//default is for a wrong guess
+	let missedFlag = true; 
  
 	//converts the guess to lowercase
 	aLetter = aLetter.toLowerCase(); 
@@ -127,8 +161,6 @@ function guesser(aLetter) {
 	}
 	//else means it's an acual letter that hasn't been guessed yet.
 	else { 
-		//default for a wrong guess
-		let missedFlag = true; 
 		//stores the letter in the array of used letters
 		usedLetterBank.push(aLetter);
 		//sorts the used letters 
@@ -175,7 +207,7 @@ function guesser(aLetter) {
 }
 
 /**
- * Starts a new game
+ * function called from the guess function when the game is over
  * 
  * Paramers determine is it was a win or a loss, and if it was a loss,
  * was it due to time up.
@@ -195,10 +227,12 @@ function gameOver(winner, timeUpLoss) {
 	//grab final score
 	var finalScore = scoreGen(winner);
 
-	// stop or disable main functionality
 
-	//stop timer
+	// functions to stop or disable main functionality
+
+	//free the system resources using setInterval (clock would cycle back to 60 anyway if I didn't clear the interval) and stop timer
 	clearInterval(intervalID);
+	clockIsRunning = false;
 	//disable game buttons 
 	disableButtons(); 
 
@@ -228,33 +262,52 @@ function gameOver(winner, timeUpLoss) {
 		gameOverMessageMissedTimesGrammar = "";
 	}
 
+	//conditionals for generating an end of game message
+
 	if (winner === true) {
+		//User won!!!
 		$("#overMessage").text("You won! " + "You finsished in " + (60 - gameTimer) + " seconds, with " + usedLetterBank.length + " turns total, and missed " + missedCount + " time" + gameOverMessageMissedTimesGrammar + ", with" + gameOverMessageHintGrammar + " using a hint. Your score is: " + finalScore);
 	} else {
 		if (timeUpLoss === true) {
+			//User Lost because they ran out of time
 			$("#overMessage").text("You loose. You ran out of time. You finsished in " + (60 - gameTimer) + " seconds, with " + usedLetterBank.length + " turns total, and missed " + missedCount + " time" + gameOverMessageMissedTimesGrammar + ", with" + gameOverMessageHintGrammar + " using a hint. Your score is: " + finalScore);
-			console.log("you ran out of time.\nThe word was " + newWord);
 		} else {
+			//The user lost because they had too many wrong guesses
 			$("#overMessage").text("You loose. You got too many wrong. You finsished in " + (60 - gameTimer) + " seconds, with " + usedLetterBank.length + " turns total, and missed " + missedCount + " time" + gameOverMessageMissedTimesGrammar + ", with" + gameOverMessageHintGrammar + " using a hint. Your score is: " + finalScore);
-			console.log("you ran out of guesses.");
 		}
 	}
-	//finds out if it was a top score in the scoreboard function
-	let scoreResult = scoreBoard(winner, finalScore); 
+	//isNewHighScore finds out if it was a top score in the scoreboard function, returns boolean: true for top 3 score, false for not top score. Scoreboard function will generate a message for the user and let them enter their name if the user makes it to the top 3
+	let isNewHighScore = scoreBoard(finalScore); 
 	//creates a button to start a new game
 	$('<input type="submit" id="newGame" value="New Game">').appendTo("#gameOver"); 
 	$("#newGame").click(function () {
 		//generates the new word.
 		newWord = randomWordGenerator(hangManArray); 
 		console.log(newWord);
-		//will grab a high score name depending on the state of scoreResult
-		grabName(scoreResult, finalScore, winner); 
+		//will grab a high score name depending on the state of isNewHighScore
+		if (isNewHighScore === true){
+			grabName(finalScore, winner); 
+		}
+
 		newGameGenerator(newWord);
-		// $("#scoreHolder").remove();
+	
 		$("#gameOver").remove();
 	});
 }
-//generates a score: lowest winning score starts at 90, highest losing score is a little below 90 depending on the percent of dashes there are left to total length of the word, which becomes a percent of 60, which coincides with what 6 wrong guesses would give you... each wrong guess on a winning game get 10 points subtracted from the score. time on the clock is added to a winners score. Using a hint will subtract 30 from your score whether you win or loose.
+
+/**
+ * generates a score
+ * 
+ * @param {boolean} winner (whether or not the user guessed the right word) 
+ * 
+ * Scoring Criteria: lowest winning score starts at 90, highest losing score
+ * is a little below 90 depending on the percent of dashes there are left to total
+ * length of the word, which becomes a percent of 60, which coincides with what 6 
+ * wrong guesses would give you... each wrong guess on a winning game get 10 points 
+ * subtracted from the score. time on the clock is added to a winners score. Using 
+ * a hint will subtract 30 from your score whether you win or loose. 
+ */
+
 function scoreGen(winner) { 
 	// initialize points for score
 	let hintScore = 0;
@@ -279,7 +332,7 @@ function scoreGen(winner) {
 }
 
 //decides whether of not thier name goes on the score board
-function scoreBoard(winner, finalScore) {  //is winner used?
+function scoreBoard(finalScore) { 
 
 	$("<p id='highMessage'></p>").appendTo("#gameOver");
 	
@@ -299,7 +352,7 @@ function scoreBoard(winner, finalScore) {  //is winner used?
 			} else if (gameCount === 2) {
 				$("#highMessage").text("You're the second person to play, so by default, you're in the top 3. (but last if you think about it) Please enter your name!");
 			} else if (finalScore > highScore[1].score) {
-				$("#highMessage").text("You automatically get on the scoreboard because you're only the thrd to play but you got second place. Please enter your name!");
+				$("#highMessage").text("You automatically get on the score board because you're only the thrd to play but you got second place. Please enter your name!");
 			} else {
 				$("#highMessage").text("You're the third person to play, so by default, you're in the top 3, but you're also in last place... Please enter your name, anyway!");
 			}
@@ -326,54 +379,37 @@ function scoreBoard(winner, finalScore) {  //is winner used?
 	}
 }
 
-//This function sets the information of player who make it to the high score board. Parameters are newScore (int), scroreResult
-function grabName(newScore, scoreResult, winner) {
-	//its a new high score
-	if (newScore === true) { 
-		if (highScore.length === 3) {
-			//get rid of the third element
-			highScore.splice(2, 1); 
-		}
-		highScore.push({
-			name: $("#scoreHolder").val(),
-			score: scoreResult,
-			win: winner
-		});
-		console.log($("#scoreHolder").val());
-		if (highScore.length > 1) {
-			highScore = objectSort(highScore);
-		}
-		$(".highPlayers").html("");
-		for (let i = 0; i < highScore.length; i++) {
-			let winLoss = "Winner";
-			if (highScore[i].win === false) {
-				winLoss = "Loser"
-			}
-			// $(".highPlayers").eq(i).html("<td>Moew</td><td>Purr</td><td>hiss</td>");
-			$(".highPlayers").eq(i).html("<td>" + highScore[i].score + "</td><td>" + highScore[i].name + "</td><td>" + winLoss + "</td>");
-			// $(".highPlayers:eq(i)").html("Hello");
-			console.log("appending");
-		}
-	}
-	console.log(highScore);
-}
+//This function sets the information of player who make it to the high score board, scroreResult
+/**
+ * 
+ * @param {int} theFinalScore 
+ * @param {boolean} winner (did user win?)
+ */
 
-
-function addTimeHTML() {
-	// var timeStamp = new Date();
-	if (timerCount === 0) {
-		timeStamp = new Date();
+function grabName(theFinalScore, winner) {
+	if (highScore.length === 3) {
+		//get rid of the third element
+		highScore.splice(2, 1); 
 	}
-	timerCount++;
-	newTime = new Date();
-	gameTimer = 60 - Math.floor((newTime - timeStamp) / 1000)
-	$("#timer").html(gameTimer);
-	if (gameTimer === 0) {
-		gameOver(false, true);
+	//add the object consisting of the name, the score and the 
+	highScore.push({
+		name: $("#scoreHolder").val(),
+		score: theFinalScore,
+		win: winner
+	});
+	console.log($("#scoreHolder").val());
+	if (highScore.length > 1) {
+		highScore = objectSort(highScore);
+	}
+	$(".highPlayers").html("");
+	for (let i = 0; i < highScore.length; i++) {
+		let winLoss = "Winner";
+		if (highScore[i].win === false) {
+			winLoss = "Loser"
+		}
+		$(".highPlayers").eq(i).html("<td>" + highScore[i].score + "</td><td>" + highScore[i].name + "</td><td>" + winLoss + "</td>");
 	}
 }
-
-
 
 function disableButtons() {
 
