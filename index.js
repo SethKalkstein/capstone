@@ -35,7 +35,9 @@ function randomWordGenerator(manArray) {
  * aword is the word generated from the random randomWordGenerator
  * 
  * Resets a bunch of the global variables for a new round of the game
- * Resets the timer and enables the buttons/main-functionality 
+ * enables the buttons/main-functionality 
+ * No return value but it does set up a couple of event listeners
+ *  
  */
 function newGameGenerator(aWord) {
 	// dashString hold the string of dashes that will apear on the screen. These dashes are placeholders for the letters to be guessed
@@ -47,7 +49,7 @@ function newGameGenerator(aWord) {
 	usedLetterBank = [];
 	hintUsed = false;
 	//sets the interval to calculate the time on the game clock every tenth of a second (100 miliseconds)
-	intervalID = setInterval(addTimeHTML, 100);
+	intervalID = setInterval(gameClock, 100);
 
 	//set hint text to "?"... oooh the intigue
 	$("#hint").html("?");
@@ -68,34 +70,65 @@ function newGameGenerator(aWord) {
 
 	enableButtons();
 }
-
-function addTimeHTML() {
-	
+/**
+ * 
+ * controls the countdown timer for the current game
+ * 
+ * no params. No returns.  
+ * 
+ * This function is called as often as the setInterval() function 
+ * (inside newGameGenerator()) function is called.
+ * 
+ * It stops being called when the clearInterval method is called
+ * clockIsRunning variable should be set to false at that time, or 
+ * the next game will start from the same time as the last game.
+ * In essense clearInterval stops the clock counter mechanism and clockIs Running
+ * is used to reset the timestamp that counter is counting down from
+ * 
+ */
+function gameClock() {
+	let currentTime = new Date();
+	//test to see if it is a new game, in which case we will start the timer
 	if (clockIsRunning === false) {
+		//the time that will be counted down from
 		timeStamp = new Date();
+		//clockIsRunning should be true while the game is ongoing
 		clockIsRunning = true;
-	}
-
-	newTime = new Date();
-	gameTimer = 10 - Math.floor((newTime - timeStamp) / 1000)
+	}	
+	//currentTime will be compared to the initial timeStamp created when the game was started
+	// to calculate the lapsed time in countdown format
+	gameTimer = 60 - Math.floor((currentTime - timeStamp) / 1000)
+	//apend the timer to the html
 	$("#timer").html(gameTimer);
+	//if the clock reaches 0, time is up, call gameOver() function
 	if (gameTimer === 0) {
 		gameOver(false, true);
 	}
 }
-
+/**
+ * re-enables buttons that are disabled inbetween games (or before a 
+ * the first game has been started enables them for the first time.)
+ * 
+ * no params or returns
+ * 
+ * sets up action listeners for the guess button, the hint button
+ * and the enter key, when user is inside the letter input box (CSS #letterHolder ID)
+ */
 function enableButtons() {
 
-	console.log("enabling");
 	//event listener for the guess button
 	$("#guess").click(function () { 
 		//calls the guesser function and passes the value of the input box to the function 
 		guesser($("#letterHolder").val()); 
-		$("#letterHolder").val(""); //and clears the letter input box
+		//and clears the letter input box after guess button is clicked
+		$("#letterHolder").val(""); 
 	});
-
+	
 	$("#letterHolder").removeAttr("disabled");
-
+	//initializes the letter holder for the first game
+	//after the first game the code below is turned on and off
+	//by removing or adding the the disabled css attribute
+	//applied to the letterholder id 
 	if (gameCount === 0) {
 		//does the same thing as as above but with the enter key while in the input box
 		$("#letterHolder").keypress(function (enterButton) { 
@@ -207,13 +240,14 @@ function guesser(aLetter) {
 }
 
 /**
- * function called from the guess function when the game is over
- * 
- * Paramers determine is it was a win or a loss, and if it was a loss,
- * was it due to time up.
+ * called from the guess function  or gameClock 
+ * when the game is over
  * 
  * @param {boolean} winner 
  * @param {boolean} timeUpLoss 
+ * 
+ * Parameters determine is it was a win or a loss, 
+ * and if it was a loss, was it due to time up
  */
 
 function gameOver(winner, timeUpLoss) { 
@@ -278,19 +312,19 @@ function gameOver(winner, timeUpLoss) {
 	}
 	//isNewHighScore finds out if it was a top score in the scoreboard function, returns boolean: true for top 3 score, false for not top score. Scoreboard function will generate a message for the user and let them enter their name if the user makes it to the top 3
 	let isNewHighScore = scoreBoard(finalScore); 
-	//creates a button to start a new game
+	//creates a button to start a new game and starts the new game
+	//initialization process
 	$('<input type="submit" id="newGame" value="New Game">').appendTo("#gameOver"); 
 	$("#newGame").click(function () {
 		//generates the new word.
 		newWord = randomWordGenerator(hangManArray); 
-		console.log(newWord);
 		//will grab a high score name depending on the state of isNewHighScore
 		if (isNewHighScore === true){
 			grabName(finalScore, winner); 
 		}
 
 		newGameGenerator(newWord);
-	
+		//get rid of the game over text
 		$("#gameOver").remove();
 	});
 }
@@ -306,6 +340,8 @@ function gameOver(winner, timeUpLoss) {
  * wrong guesses would give you... each wrong guess on a winning game get 10 points 
  * subtracted from the score. time on the clock is added to a winners score. Using 
  * a hint will subtract 30 from your score whether you win or loose. 
+ * 
+ *  @returns score (an integer value)
  */
 
 function scoreGen(winner) { 
@@ -313,13 +349,16 @@ function scoreGen(winner) {
 	let hintScore = 0;
 	let score = 0; 
 	let dashCount = 0;
-
+	//subtraction for using a hint
 	if (hintUsed === true) {
 		hintScore = 30;
 	}
+
 	if (winner === true) {
+		//winners get extra points for time left on the game clock
 		score = gameTimer + 170 - (missedCount * 10 + hintScore);
 	} else {
+		//loosers get credit for the percentage of letters they got right
 		for (let i = 0; i < dashStringArray.length; i++) {
 			if (dashStringArray[i] === "_") {
 				dashCount++;
@@ -331,32 +370,44 @@ function scoreGen(winner) {
 	return score;
 }
 
-//decides whether of not thier name goes on the score board
+/**
+ * decides whether of not thier name goes on the score board
+ *  
+ * @param {number} finalScore an integer created in the scoreGen function
+ * 
+ * @returns {boolean} representing whether or not the user has made it to the 
+ * the high score board. True if it's a new high score, false if not.
+ */
 function scoreBoard(finalScore) { 
-
+	//create html element to hold a message that is appended to the
+	//game over message. I could really go for a game over massage right now ;)
 	$("<p id='highMessage'></p>").appendTo("#gameOver");
 	
-	console.log(finalScore);
 	//score board has top 3 contenders so you automatically go in if you're one of the first 3 players
 	if (gameCount <= 3) { 
 		$("#gameOver").css({
 			"height": "300px"
 		});
-		//if they're the first player to finish
+		//first game for user
 		if (gameCount == 1) { 
 			$("#highMessage").text("You're the first person to play, so by default, you have the high score. (and also the low score) Please enter your name!");
-		//if they're not the first to finish, but still first 3
-		} else { 
+		//not first game for user but still first 3
+		} else {
+			//highest score so far, for second or third game
 			if (finalScore > highScore[0].score) {
 				$("#highMessage").text("Congratulations! You have the new high score!!!! Please enter your name!");
+			//second game but not highest score is the lowest score!
 			} else if (gameCount === 2) {
 				$("#highMessage").text("You're the second person to play, so by default, you're in the top 3. (but last if you think about it) Please enter your name!");
+			//otherwise it is the third game and they placed higher than the current second place
 			} else if (finalScore > highScore[1].score) {
-				$("#highMessage").text("You automatically get on the score board because you're only the thrd to play but you got second place. Please enter your name!");
+				$("#highMessage").text("You automatically get on the score board because you're only the third to play but you got second place. Not bad. Please enter your name!");
+			// only option left is to be third place and lower than the current second, aka thrid, aka last place
 			} else {
 				$("#highMessage").text("You're the third person to play, so by default, you're in the top 3, but you're also in last place... Please enter your name, anyway!");
 			}
 		}
+		//appends input box for name to be typed in
 		$('<input type="text" id="scoreHolder" maxlength="16" placeholder="enter name here:">').appendTo("#gameOver");
 		return true;
 
@@ -365,16 +416,22 @@ function scoreBoard(finalScore) {
 		$("#gameOver").css({
 			"height": "300px"
 		});
+		//higher than the previous high score. Way to go
 		if (finalScore > highScore[0].score) {
 			$("#highMessage").text("Congratulations! You have the new high score!!!! Please enter your name!");
+		//higher than the previous second place score
 		} else if (finalScore > highScore[1].score) {
 			$("#highMessage").text("Congratulations! You made it to second place. Please enter your name!");
+		//higher than the previous third place score
 		} else {
 			$("#highMessage").text("Congratulations! You made it to third place. Please enter your name!");
 		}
+		//input box for name
 		$('<input type="text" id="scoreHolder" maxlength="16" placeholder="enter name here:">').appendTo("#gameOver");
 		return true;
 	} else {
+		$("#gameOver").css({ "height": "250px" });
+		$("#highMessage").text("You didn't make it to the score board. Better luck next time");
 		return false;
 	}
 }
