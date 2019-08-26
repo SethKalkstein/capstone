@@ -1,7 +1,21 @@
+/**
+ * A game of "hangman"
+ * 
+ * A list of word will be selected at random from a list of words, and there is a corresponding list of hints
+ * if the user needs help guessing the word. They will be able to guess one letter at a time and they can 
+ * enter their name if they get a top score.
+ * 
+ * The first game is started by a new word (newWord) being initialized, then at the bottom of this code
+ * the new game generator is called, taking in the new word as an argument. The newGameGenerator
+ * calls other functions needed to start the first game. When a new game is being played the 
+ * newGameGenerator is called from within the gameOver function.
+ * 
+ */
+
 //words that the player will be guessing
 const hangManArray = ["mother", "word", "something", "another", "great", "random", "butterfly", "kittycat"];
 //variable to hold hints
-const hintArray = ["withour her you wouldn't be here","the basic structure of a sentance", "not nothing", "distinctly different", "better than good", "no specific pattern", "in the sky, I can fly twice as high", "cute, soft, and dangerous"];
+const hintArray = ["without her you wouldn't be here","the basic structure of a sentance", "not nothing", "distinctly different", "better than good", "no specific pattern", "in the sky, I can fly twice as high", "cute, soft, and dangerous"];
 //will hold letters or dashes
 var dashStringArray = [];
 //letters that have already been used 
@@ -14,6 +28,8 @@ var clockIsRunning = false;
 var gameCount = 0;
 var hintUsed = false;
 var highScore = [];
+//initialize the first word
+let newWord = randomWordGenerator(hangManArray);
 
 /**
  * generates a random word from the hangman word array and returns it
@@ -444,33 +460,37 @@ function scoreBoard(finalScore) {
  */
 
 function grabName(theFinalScore, winner) {
+	//test to see if there are currently 3 names on the scoreboard
 	if (highScore.length === 3) {
-		//get rid of the third element
+		//get rid of the third (lowest scoring) element if there are
 		highScore.splice(2, 1); 
 	}
-	//add the object consisting of the name, the score and the 
+	//add the object consisting of the name, the score and the win/loose game status
 	highScore.push({
 		name: $("#scoreHolder").val(),
 		score: theFinalScore,
 		win: winner
 	});
-	console.log($("#scoreHolder").val());
+	//if there is more than one score on the scoreboard, sort it
 	if (highScore.length > 1) {
 		highScore = objectSort(highScore);
 	}
-	$(".highPlayers").html("");
+	//apend the array of the highest scores to the html in table format
 	for (let i = 0; i < highScore.length; i++) {
 		let winLoss = "Winner";
+		//create text for whether they won or lost the game
 		if (highScore[i].win === false) {
 			winLoss = "Loser"
 		}
+		//other text can be taken directly from the high score object
 		$(".highPlayers").eq(i).html("<td>" + highScore[i].score + "</td><td>" + highScore[i].name + "</td><td>" + winLoss + "</td>");
 	}
 }
-
+/**
+ * Disables main functionality when a user is not currently playing a game
+ * by disabling 
+ */
 function disableButtons() {
-
-	console.log("disabling");
 
 	$("#guess").off("click");
 	$("#letterHolder").attr("disabled", true);
@@ -478,29 +498,33 @@ function disableButtons() {
 }
 
 //arg is an an array of objects to be sorted (t.b.s)
-function objectSort(tbs) {
+
+/**
+ * Sorts high score objects according to thier score
+ * 
+ * @param {Object[]} toBeSorted is an array of objects holding user name, score and win/loose status
+ * 
+ * @returns {Object[]} 
+ */
+function objectSort(toBeSorted) {
 	//will hold the objects to be switched 
-	var holder1 = {}; 
-	//other holder
-	var holder2 = {}; 
-	for (var i = 0; i < tbs.length - 1; i++) {
-		for (let j = 0; j < tbs.length - (i + 1); j++) {
-			console.log("tbsj " + tbs[j] + " tbsj+1 " + tbs[j + 1] + " i " + i + " j " + j);
-			if (tbs[j].score < tbs[j + 1].score) {
-				holder1 = tbs[j];
-				holder2 = tbs[j + 1]
-				tbs[j] = holder2;
-				tbs[j + 1] = holder1;
+	var holder = {}; 
+	//outer loop, because the current element will be compare to the next one, stop one element before the last, otherwise you will be attempting to compare an element to one that doesn't exist (there's no 10th element in an array of 9 elements)
+	for (var i = 0; i < toBeSorted.length - 1; i++) {
+		//inner loop, each time the inner loop is run it can stop one iteration before it did the last time around because the last iteration will have ended with pushing the highest number evaluated to the end of the array that is being evaluated for that particular iteration. (still take into account that you'll be comparing the current element (represented by the current iteration of the loop) to the next element in the array)
+		for (let j = 0; j < toBeSorted.length - (i + 1); j++) {
+			//choose the score property of the object to compare
+			//if the current score is less than the next in the list, switch them using a temporary place holder
+			if (toBeSorted[j].score < toBeSorted[j + 1].score) {
+				holder = toBeSorted[j];
+				toBeSorted[j] = toBeSorted[j + 1];
+				toBeSorted[j + 1] = holder;
 			}
 		}
 	}
-	return tbs;
+	//its now sorted, return it!
+	return toBeSorted;
 }
 
-//generates the first word (down here becuase of hoisting?)
-let newWord = randomWordGenerator(hangManArray); 
-
-// console.log(newWord);
-//generates everything else and resets the variables
+//Start the first game!
 newGameGenerator(newWord); 
-// enableButtons();
