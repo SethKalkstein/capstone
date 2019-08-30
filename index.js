@@ -64,6 +64,8 @@ function newGameGenerator(aWord) {
 	missedCount = 0;
 	usedLetterBank = [];
 	hintUsed = false;
+	//show the hang pole
+	setImage(missedCount, false, false);
 	//sets the interval to calculate the time on the game clock every tenth of a second (100 miliseconds)
 	intervalID = setInterval(gameClock, 100);
 
@@ -118,6 +120,7 @@ function gameClock() {
 	$("#timer").html(gameTimer);
 	//if the clock reaches 0, time is up, call gameOver() function
 	if (gameTimer === 0) {
+		setImage(missedCount, false, true);
 		gameOver(false, true);
 	}
 }
@@ -131,7 +134,6 @@ function gameClock() {
  * and the enter key, when user is inside the letter input box (CSS #letterHolder ID)
  */
 function enableButtons() {
-
 	//event listener for the guess button
 	$("#guess").click(function () { 
 		//calls the guesser function and passes the value of the input box to the function 
@@ -240,6 +242,7 @@ function guesser(aLetter) {
 			//adds to the the wrong guess count if the wrong guess default is still true
 			missedCount++; 
 			//and displays it
+			setImage(missedCount,false, false);
 			$("#missed").html(missedCount); 
 		}
 	}
@@ -251,8 +254,65 @@ function guesser(aLetter) {
 
 	//if there are no more dashes in the array, then it means the word has been guessed
 	if (dashStringArray.indexOf("_") === -1) { 
-		gameOver(true, null);
+		setImage(missedCount, true, false);
+		gameOver(true, false);
 	}
+}
+
+/**
+ * Will control the classic hangman graphic depending on how many letters the player has missed
+ * or if they have won the game
+ * 
+ * @param {number} missedLetterCount int representing the the number of missed letters
+ * @param {boolean} isGameWon reresenting whether the game is won or not 
+ * @param {boolean} isTimeUp Did the game clock expire
+ */
+function setImage (missedLetterCount, isGameWon, isTimeUp){
+	console.log("missed letter count: "+missedLetterCount);
+	// condition for a win
+	if (isGameWon === true){
+		imageResetHTML(7);
+	// condition if the time is up
+	} else if (isTimeUp === true){
+		imageResetHTML(6);
+	// switch statement for the different amounts wrong
+	} else {
+		switch(missedLetterCount){
+			case 0:
+				imageResetHTML(0);
+				break;
+			case 1:
+				imageResetHTML(1);
+				break;
+			case 2:
+				imageResetHTML(2);
+				break;
+			case 3:
+				imageResetHTML(3);
+				break;
+			case 4:
+				imageResetHTML(4);
+				break;
+			case 5:
+				imageResetHTML(5);
+				break;
+			case 6:
+				imageResetHTML(6);
+				break;
+		}
+	}
+}
+/**
+ * Creates the inner HMTL for the image tag
+ * 
+ * @param {number} imageState 0 to 7 represents number of missed turns or a win or a loss
+ */
+function imageResetHTML(imageState){
+	console.log("image state is: " + imageState);
+	const imageFiles = ["hangPole.png", "hangHead.png", "hangBody.png", "hangRightArm.png", "hangBothArms.png", "hangLeftLeg.png", "hangDead.png", "hangWin.png"];
+	const altMessages = ["no missed letters. The hang pole is empty.", "one missed letter. Stick figure head is on the the hang pole.", "two missed letters. Stick figure head and body are on the hang pole.", "three missed letters. Stick figure head, body and right arm are on the hang pole.", "four missed letters. Stick figure head, body, and both arms are on the hang pole.", "five missed letters. Stick figure head, body, and both arms are on the hang pole.", "a hanged stick figure on the pole. Game Over, You Loose", "a free stick figure. You Won!"];
+
+	$(".hangmanImageWrapper").html('<img src="images/'+imageFiles[imageState]+'" alt="hang man pole image, with'+altMessages[imageState]+'"> ');
 }
 
 /**
