@@ -25,11 +25,15 @@ let gameTimer = 60;
 var missedCount; 
 var timeStamp = new Date();
 var clockIsRunning = false;
-var gameCount = 0;
+// var gameCount = 0;
 var hintUsed = false;
-var highScore = [];
+var gameCount =  localStorage.getItem("gameCount") ? JSON.parse(localStorage.getItem("gameCount")) : 1; 
+//grab any locally stored high scores if they exist and display them
+var highScore = localStorage.getItem("highScore") ? JSON.parse(localStorage.getItem("highScore")) : [];
+displayHighScore();
 //initialize the first word
 let newWord = randomWordGenerator(hangManArray);
+
 
 /**
  * generates a random word from the hangman word array and returns it
@@ -147,7 +151,7 @@ function enableButtons() {
 	//after the first game the code below is turned on and off
 	//by removing or adding the the disabled css attribute
 	//applied to the letterholder id 
-	if (gameCount === 0) {
+	window.onload = () => {
 		//does the same thing as as above but with the enter key while in the input box
 		$("#letterHolder").keypress(function (enterButton) { 
 			var key = enterButton.which;
@@ -163,8 +167,6 @@ function enableButtons() {
 		$("#hint").html(hintArray[hangManArray.indexOf(newWord)]);
 		hintUsed = true;
 	})
-
-	gameCount++;
 }
 
 /**
@@ -268,7 +270,6 @@ function guesser(aLetter) {
  * @param {boolean} isTimeUp Did the game clock expire
  */
 function setImage (missedLetterCount, isGameWon, isTimeUp){
-	console.log("missed letter count: "+missedLetterCount);
 	// condition for a win
 	if (isGameWon === true){
 		imageResetHTML(7);
@@ -308,7 +309,6 @@ function setImage (missedLetterCount, isGameWon, isTimeUp){
  * @param {number} imageState 0 to 7 represents number of missed turns or a win or a loss
  */
 function imageResetHTML(imageState){
-	console.log("image state is: " + imageState);
 	const imageFiles = ["hangPole.png", "hangHead.png", "hangBody.png", "hangRightArm.png", "hangBothArms.png", "hangLeftLeg.png", "hangDead.png", "hangWin.png"];
 	const altMessages = ["no missed letters. The hang pole is empty.", "one missed letter. Stick figure head is on the the hang pole.", "two missed letters. Stick figure head and body are on the hang pole.", "three missed letters. Stick figure head, body and right arm are on the hang pole.", "four missed letters. Stick figure head, body, and both arms are on the hang pole.", "five missed letters. Stick figure head, body, and both arms are on the hang pole.", "a hanged stick figure on the pole. Game Over, You Loose", "a free stick figure. You Won!"];
 
@@ -392,13 +392,18 @@ function gameOver(winner, timeUpLoss) {
 	//initialization process
 	$('<input type="submit" id="newGame" value="New Game">').appendTo("#gameOver"); 
 	$("#newGame").click(function () {
-		//generates the new word.
-		newWord = randomWordGenerator(hangManArray); 
+ 
 		//will grab a high score name depending on the state of isNewHighScore
 		if (isNewHighScore === true){
 			grabName(finalScore, winner); 
 		}
-
+		//game is now considered complete, increment game counter
+		gameCount++;
+		//store game count locally
+		localStorage.setItem("gameCount",JSON.stringify(gameCount));
+		//generates the new word.
+		newWord = randomWordGenerator(hangManArray);
+		//start new game
 		newGameGenerator(newWord);
 		//get rid of the game over text
 		$("#gameOver").remove();
@@ -535,6 +540,15 @@ function grabName(theFinalScore, winner) {
 	if (highScore.length > 1) {
 		highScore = objectSort(highScore);
 	}
+	//store score locally
+	localStorage.setItem("highScore", JSON.stringify(highScore));
+	//display the highscore
+	displayHighScore();
+}
+/**
+ * renders the high score object to to be displayed in the HTML
+ */
+function displayHighScore() {
 	//apend the array of the highest scores to the html in table format
 	for (let i = 0; i < highScore.length; i++) {
 		let winLoss = "Winner";
@@ -546,6 +560,7 @@ function grabName(theFinalScore, winner) {
 		$(".highPlayers").eq(i).html("<td>" + highScore[i].score + "</td><td>" + highScore[i].name + "</td><td>" + winLoss + "</td>");
 	}
 }
+
 /**
  * Disables main functionality when a user is not currently playing a game
  * by disabling 
