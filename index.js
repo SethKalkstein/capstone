@@ -312,7 +312,7 @@ function imageResetHTML(imageState){
 	const imageFiles = ["hangPole.png", "hangHead.png", "hangBody.png", "hangRightArm.png", "hangBothArms.png", "hangLeftLeg.png", "hangDead.png", "hangWin.png"];
 	const altMessages = ["no missed letters. The hang pole is empty.", "one missed letter. Stick figure head is on the the hang pole.", "two missed letters. Stick figure head and body are on the hang pole.", "three missed letters. Stick figure head, body and right arm are on the hang pole.", "four missed letters. Stick figure head, body, and both arms are on the hang pole.", "five missed letters. Stick figure head, body, and both arms are on the hang pole.", "a hanged stick figure on the pole. Game Over, You Loose", "a free stick figure. You Won!"];
 
-	$(".hangmanImageWrapper").html('<img src="images/'+imageFiles[imageState]+'" alt="hang man pole image, with'+altMessages[imageState]+'"> ');
+	$("#hangmanImageWrapper").html('<img src="images/'+imageFiles[imageState]+'" alt="hang man pole image, with'+altMessages[imageState]+'"> ');
 }
 
 /**
@@ -347,7 +347,7 @@ function gameOver(winner, timeUpLoss) {
 	disableButtons(); 
 
 	//create modal
-	$('<div id="gameOver"></div>').appendTo('body'); 
+	$('<section id="gameOver"></section>').appendTo('body'); 
 	//set modal css
 	$("#gameOver").css({
 		"height": "200px",
