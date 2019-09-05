@@ -13,7 +13,7 @@
  */
 
 //words that the player will be guessing
-const hangManArray = ["mother", "word", "something", "another", "great", "random", "butterfly", "kittycat"];
+const hangManArray = ["butterfly"] //,"mother", "word", "something", "another", "great", "random", "butterfly", "kittycat"];
 //variable to hold hints
 const hintArray = ["without her you wouldn't be here","the basic structure of a sentance", "not nothing", "distinctly different", "better than good", "no specific pattern", "in the sky, I can fly twice as high", "cute, soft, and dangerous"];
 //will hold letters or dashes
@@ -119,7 +119,7 @@ function gameClock() {
 	}	
 	//currentTime will be compared to the initial timeStamp created when the game was started
 	// to calculate the lapsed time in countdown format
-	gameTimer = 60 - Math.floor((currentTime - timeStamp) / 1000)
+	gameTimer = 80 - Math.floor((currentTime - timeStamp) / 1000)
 	//apend the timer to the html
 	$("#timer").html(gameTimer);
 	//if the clock reaches 0, time is up, call gameOver() function
@@ -349,13 +349,13 @@ function gameOver(winner, timeUpLoss) {
 	//create modal
 	$('<section id="gameOver"></section>').appendTo('body'); 
 	//set modal css
-	$("#gameOver").css({
-		"height": "200px",
-		"width": "300px",
-		"background-color": "red",
-		"border": "1px solid black",
-		"border-radius": "10px"
-	}); 
+	// $("#gameOver").css({
+		// "height": "200px",
+		// "width": "300px",
+		// "background-color": "red",
+		// "border": "1px solid black",
+	// 	"border-radius": "10px"
+	// }); 
 	//create html element to hold the game over message
 	$('<p id="overMessage"></p>').appendTo("#gameOver");
 

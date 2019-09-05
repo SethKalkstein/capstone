@@ -14,14 +14,20 @@
 		<p>Figure out a word by guessing one letter at a time. You get 6 misses total. If you need help press the hint hint button. You will loose points for using a hint and for missed letters. You will gain points for completeing the word.</p>
 	</header>
 
-	<main>
+	<main>		
 		<section id="userInput">
 			<!-- user input for guessed letter -->
 			<input id="letterHolder" type="text" name="holder">
 			<!-- submit button for guessed letter -->
-			<input id="guess" type="submit" name="holder" value="guess">
+			<input id="guess" type="submit" name="holder" value="Guess">
 		</section>
 		
+		<section id="timerArea">
+			<!-- the game timer -->
+			<h3>Timer</h3>
+			<p id="timer"></p>
+		</section>
+
 		<!-- place holder for the word that will be guessed -->
 		<p id="wordHolder"></p>
 		
@@ -38,11 +44,10 @@
 			<p id="hint">?</p>
 		</section>
 
-		<section id="timerArea">
-			<!-- the game timer -->
-			<h3>Timer</h3>
-			<p id="timer"></p>
-		</section>
+		<!-- area that will hold the classic hang man graphic -->
+		<figure id="hangmanImageWrapper">
+			<!-- <img src=""> -->
+		</figure>
 
 		<!-- score board keeping track of the three highest scores. Displays their name, their score, and whither they had a win or a loss -->
 		<section id="winnerArea">
@@ -58,11 +63,6 @@
 				<tr class="highPlayers"></tr>
 			</table>
 		</section>
-
-		<!-- area that will hold the classic hang man graphic -->
-		<figure id="hangmanImageWrapper">
-			<!-- <img src=""> -->
-		</figure>
 	</main>
 
 	<script type="text/javascript" src="index.js"></script>

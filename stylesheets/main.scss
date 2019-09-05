@@ -1,3 +1,103 @@
+@import "variables";
+@import "mixins";
 @import "backgrounds";
-@import "gridLayout";
-@import "animation"
+@import "layout";
+@import "animation";
+
+* {
+    padding: 0px;
+    margin: 0px;
+}
+
+body {
+    width: 98%;
+    position: relative;
+}
+
+#userInput{
+    text-align: center;
+    display: block;
+
+    #letterHolder{
+        margin: 0 auto;
+        display: block;
+        width: 20%;
+        font-size: 80px;
+        opacity: .25;
+    }
+
+    #guess{
+        background-color: blue;
+        opacity: .75;
+        color: white;
+        border-radius: 33%;
+        border-color: darkblue;
+        width: 25%;
+        font-size: 25px;
+        padding: 5px;
+    }
+}
+
+#wordHolder{
+    text-align: center;
+    font-size: 40px;
+    margin: auto 0 0 0;
+    padding: 5px;
+    // border: 1px solid red;
+    font-weight: bolder;
+    font-family: "Courier New", Courier, monospace;
+    text-transform: uppercase;
+    @include mediaQuery($breakpoint2 + 1px){
+        font-size: 50px;
+    }           
+}
+#timerArea {
+    text-align: center;
+    margin: 0px;
+    #timer {
+        font-size: 90px;
+        padding: 0px;
+    }
+}
+
+
+#usedLetters {
+    text-align: center;
+    #used{
+        text-transform: uppercase;
+    }
+}
+
+#hintArea{
+    text-align: center;
+}
+
+#hangmanImageWrapper {
+  img{
+      height: 400px;
+  }
+}
+
+#winnerArea {
+    text-align: center;
+    table {
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+#gameOver{
+    position: absolute;
+    top: 100px;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: lightgray;
+    opacity: .85;
+    border: 3px solid purple;
+    width: 50%;
+    height: 50%;
+    font-size: 2em;
+    border-radius: 10px;
+}
