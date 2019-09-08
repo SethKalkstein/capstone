@@ -9,21 +9,22 @@ main {
     "winners  winners";
     grid-template-columns: 1fr 1fr; 
 
-    // @include mediaQuery($breakpoint1, $breakpoint2){
-    //     grid-template-areas:
-    //     "input    timer    word"
-    //     "hint     hint   images"
-    //     "letters letters images"
-    //     "winners  winners  images";
-    //     grid-template-columns: 1fr 1fr 6fr;
-    // }
+    @include mediaQuery($breakpoint1, $breakpoint2){
+        grid-template-areas:
+        "input    timer    word"
+        "none     none    images"
+        "hint     hint   images"
+        "letters  letters  images"
+        "winners winners  winners";
+        grid-template-columns: 17% 17% 66%;
+    }
 
     @include mediaQuery($breakpoint2 + 1px){
         grid-template-areas:
         "input  timer    word"
         "input images letters"
         "hint  images  winners";
-        grid-template-columns: 1fr 2fr 2fr;
+        grid-template-columns: 2fr 3fr 5fr;
     }
 }
 

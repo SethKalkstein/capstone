@@ -11,10 +11,16 @@ main {
   grid-template-areas: "input     timer" "word       word" "letters  letters" "hint        hint" "images     images" "winners  winners";
   grid-template-columns: 1fr 1fr;
 }
+@media screen and (min-width: 625px) and (max-width: 1400px) {
+  main {
+    grid-template-areas: "input    timer    word" "none     none    images" "hint     hint   images" "letters  letters  images" "winners winners  winners";
+    grid-template-columns: 17% 17% 66%;
+  }
+}
 @media screen and (min-width: 1401px) {
   main {
     grid-template-areas: "input  timer    word" "input images letters" "hint  images  winners";
-    grid-template-columns: 1fr 2fr 2fr;
+    grid-template-columns: 2fr 3fr 5fr;
   }
 }
 
@@ -54,28 +60,102 @@ main {
 body {
   width: 98%;
   position: relative;
+  padding: 5px;
+}
+@media screen and (min-width: 625px) and (max-width: 1400px) {
+  body {
+    padding: 10px;
+  }
+}
+@media screen and (min-width: 1401px) {
+  body {
+    padding: 20px;
+  }
+}
+
+header {
+  text-align: center;
+  font-weight: bold;
+}
+header h1 {
+  font-weight: bolder;
+  text-shadow: 1px 1px black;
+  color: antiquewhite;
+}
+header span {
+  display: none;
+}
+header p:hover > span {
+  display: inline;
+}
+@media screen and (min-width: 625px) and (max-width: 1400px) {
+  header span {
+    display: inline;
+  }
+  header h1 {
+    font-size: 3em;
+    text-shadow: 3px 3px black;
+  }
+}
+@media screen and (min-width: 1401px) {
+  header h1 {
+    text-shadow: 6px 4px black;
+    font-size: 6em;
+  }
+  header p {
+    font-size: 1.5em;
+  }
+  header span {
+    display: inline;
+  }
 }
 
 #userInput {
   text-align: center;
   display: block;
+  margin: 5px;
 }
 #userInput #letterHolder {
-  margin: 0 auto;
+  margin: 3px auto;
   display: block;
-  width: 20%;
-  font-size: 80px;
-  opacity: 0.25;
+  width: 40px;
+  font-size: 70px;
+  background-color: rgba(255, 255, 255, 0.25);
+  color: #00002e;
+  border: none;
+  border-radius: 25%;
 }
 #userInput #guess {
   background-color: blue;
   opacity: 0.75;
   color: white;
-  border-radius: 33%;
+  border-radius: 10px;
   border-color: darkblue;
-  width: 25%;
+  width: 80px;
   font-size: 25px;
   padding: 5px;
+}
+@media screen and (min-width: 625px) and (max-width: 1400px) {
+  #userInput #letterHolder {
+    width: 60px;
+    font-size: 110px;
+  }
+  #userInput #guess {
+    width: 110px;
+    font-size: 35px;
+    padding: 0px;
+  }
+}
+@media screen and (min-width: 1401px) {
+  #userInput #letterHolder {
+    width: 80px;
+    font-size: 150px;
+  }
+  #userInput #guess {
+    width: 150px;
+    font-size: 50px;
+    padding: 0px;
+  }
 }
 
 #wordHolder {
@@ -87,6 +167,14 @@ body {
   font-family: "Courier New", Courier, monospace;
   text-transform: uppercase;
 }
+@media screen and (min-width: 625px) and (max-width: 1400px) {
+  #wordHolder {
+    font-weight: bolder;
+    font-size: 35px;
+    text-shadow: 1px 2px black;
+    text-align: left;
+  }
+}
 @media screen and (min-width: 1401px) {
   #wordHolder {
     font-size: 50px;
@@ -95,34 +183,183 @@ body {
 
 #timerArea {
   text-align: center;
-  margin: 0px;
+  margin: 5px;
+}
+#timerArea h3 {
+  font-size: 30px;
+  padding: 10px;
 }
 #timerArea #timer {
-  font-size: 90px;
+  font-size: 60px;
   padding: 0px;
+}
+@media screen and (min-width: 625px) and (max-width: 1400px) {
+  #timerArea h3 {
+    font-size: 30px;
+  }
+  #timerArea #timer {
+    font-size: 50px;
+    padding: 0px;
+  }
+}
+@media screen and (min-width: 1401px) {
+  #timerArea {
+    font-weight: bold;
+  }
+  #timerArea h3 {
+    font-size: 40px;
+  }
+  #timerArea #timer {
+    font-size: 60px;
+    padding: 0px;
+  }
 }
 
 #usedLetters {
   text-align: center;
 }
+#usedLetters h3 {
+  font-size: 35px;
+}
 #usedLetters #used {
   text-transform: uppercase;
+  font-size: 25px;
+}
+@media screen and (min-width: 625px) and (max-width: 1400px) {
+  #usedLetters {
+    border-bottom: 1px solid black;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+  }
+  #usedLetters #used {
+    font-size: 30px;
+  }
+}
+@media screen and (min-width: 1401px) {
+  #usedLetters {
+    margin-top: 30px;
+  }
+  #usedLetters h3 {
+    font-size: 40px;
+    text-decoration: underline;
+    padding-bottom: 5px;
+  }
+  #usedLetters #used {
+    font-size: 35px;
+    border-bottom: 1px solid black;
+    padding-bottom: 20px;
+  }
 }
 
 #hintArea {
   text-align: center;
+  margin-top: 10px;
+}
+#hintArea #hintButton {
+  background-color: blue;
+  opacity: 0.75;
+  color: white;
+  border-radius: 10px;
+  border-color: darkblue;
+  width: 80px;
+  font-size: 25px;
+  padding: 5px;
+}
+#hintArea #hint {
+  font-size: 25px;
+}
+@media screen and (min-width: 625px) and (max-width: 1400px) {
+  #hintArea {
+    margin-top: 20px;
+    border-bottom: 1px solid black;
+    margin-bottom: 30px;
+  }
+  #hintArea #hintButton {
+    width: 110px;
+    font-size: 35px;
+    padding: 0px;
+  }
+  #hintArea #hint {
+    font-size: 25px;
+    padding: 10px;
+  }
+}
+@media screen and (min-width: 1401px) {
+  #hintArea {
+    margin-top: 0px;
+  }
+  #hintArea #hintButton {
+    width: 150px;
+    font-size: 50px;
+    padding: 0px;
+  }
+  #hintArea #hint {
+    font-size: 35px;
+    padding: 15px;
+  }
 }
 
 #hangmanImageWrapper img {
-  height: 400px;
+  display: block;
+  height: 300px;
+  margin-right: auto;
+  margin-left: auto;
+}
+@media screen and (min-width: 625px) and (max-width: 1400px) {
+  #hangmanImageWrapper img {
+    height: 300px;
+    margin: 50px;
+  }
+}
+@media screen and (min-width: 1401px) {
+  #hangmanImageWrapper img {
+    height: 450px;
+  }
 }
 
 #winnerArea {
   text-align: center;
 }
+#winnerArea h3 {
+  font-weight: bold;
+  font-size: 30px;
+}
 #winnerArea table {
   margin-left: auto;
   margin-right: auto;
+  border: 1px solid black;
+  border-collapse: collapse;
+  font-size: 23px;
+  text-align: left;
+}
+#winnerArea table th {
+  border-bottom: 3px solid black;
+  border-right: 1px solid black;
+}
+#winnerArea table td {
+  border: 1px solid black;
+}
+@media screen and (min-width: 625px) and (max-width: 1400px) {
+  #winnerArea h3 {
+    font-size: 50px;
+  }
+  #winnerArea table {
+    font-size: 35px;
+  }
+  #winnerArea table th {
+    border-bottom: 5px solid black;
+  }
+}
+@media screen and (min-width: 1401px) {
+  #winnerArea h3 {
+    font-size: 70px;
+  }
+  #winnerArea table {
+    font-size: 37px;
+  }
+  #winnerArea table th {
+    border-bottom: 5px solid black;
+  }
 }
 
 #gameOver {
@@ -132,13 +369,35 @@ body {
   right: 0;
   margin-left: auto;
   margin-right: auto;
-  background-color: lightgray;
-  opacity: 0.85;
-  border: 3px solid purple;
-  width: 50%;
-  height: 50%;
-  font-size: 2em;
+  background-color: rgba(214, 231, 212, 0.85);
+  border: 3px solid green;
+  width: 80%;
+  padding: 10px;
+  font-size: 1.6em;
   border-radius: 10px;
+}
+@media screen and (min-width: 625px) and (max-width: 1400px) {
+  #gameOver {
+    font-size: 2em;
+  }
+  #gameOver #scoreHolder {
+    font-size: 30px;
+  }
+  #gameOver #newGame {
+    font-size: 25px;
+  }
+}
+@media screen and (min-width: 1401px) {
+  #gameOver {
+    widows: 65%;
+    font-size: 3em;
+  }
+  #gameOver #scoreHolder {
+    font-size: 40px;
+  }
+  #gameOver #newGame {
+    font-size: 35px;
+  }
 }
 
 /*# sourceMappingURL=main.css.map */

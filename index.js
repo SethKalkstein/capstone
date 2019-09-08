@@ -13,9 +13,9 @@
  */
 
 //words that the player will be guessing
-const hangManArray = ["butterfly"] //,"mother", "word", "something", "another", "great", "random", "butterfly", "kittycat"];
+const hangManArray = ["hello", "world", "food", "face", "dog", "mother", "word", "something", "another", "great", "random", "butterfly", "kittycat"];
 //variable to hold hints
-const hintArray = ["without her you wouldn't be here","the basic structure of a sentance", "not nothing", "distinctly different", "better than good", "no specific pattern", "in the sky, I can fly twice as high", "cute, soft, and dangerous"];
+const hintArray = ["common greeting", "terra prime", "it's what's for dinner", "look in the mirror", "you ain't nothin butta", "without her you wouldn't be here","the basic structure of a sentance", "not nothing", "distinctly different", "better than good", "no specific pattern", "in the sky, I can fly twice as high", "cute, soft, and dangerous"];
 //will hold letters or dashes
 var dashStringArray = [];
 //letters that have already been used 
@@ -25,7 +25,6 @@ let gameTimer = 60;
 var missedCount; 
 var timeStamp = new Date();
 var clockIsRunning = false;
-// var gameCount = 0;
 var hintUsed = false;
 var gameCount =  localStorage.getItem("gameCount") ? JSON.parse(localStorage.getItem("gameCount")) : 1; 
 //grab any locally stored high scores if they exist and display them
@@ -119,11 +118,11 @@ function gameClock() {
 	}	
 	//currentTime will be compared to the initial timeStamp created when the game was started
 	// to calculate the lapsed time in countdown format
-	gameTimer = 80 - Math.floor((currentTime - timeStamp) / 1000)
+	gameTimer = 60 - Math.floor((currentTime - timeStamp) / 1000)
 	//apend the timer to the html
 	$("#timer").html(gameTimer);
 	//if the clock reaches 0, time is up, call gameOver() function
-	if (gameTimer === 0) {
+	if (gameTimer <= 0) {
 		setImage(missedCount, false, true);
 		gameOver(false, true);
 	}
@@ -249,7 +248,7 @@ function guesser(aLetter) {
 		}
 	}
 
-	//6 missed guesses and you loose!!! (or change the if condition to whatever number of misses you want)
+	//6 missed guesses and you lose!!! (or change the if condition to whatever number of misses you want)
 	if (missedCount === 6) { 
 		gameOver(false, false);
 	}
@@ -310,7 +309,7 @@ function setImage (missedLetterCount, isGameWon, isTimeUp){
  */
 function imageResetHTML(imageState){
 	const imageFiles = ["hangPole.png", "hangHead.png", "hangBody.png", "hangRightArm.png", "hangBothArms.png", "hangLeftLeg.png", "hangDead.png", "hangWin.png"];
-	const altMessages = ["no missed letters. The hang pole is empty.", "one missed letter. Stick figure head is on the the hang pole.", "two missed letters. Stick figure head and body are on the hang pole.", "three missed letters. Stick figure head, body and right arm are on the hang pole.", "four missed letters. Stick figure head, body, and both arms are on the hang pole.", "five missed letters. Stick figure head, body, and both arms are on the hang pole.", "a hanged stick figure on the pole. Game Over, You Loose", "a free stick figure. You Won!"];
+	const altMessages = ["no missed letters. The hang pole is empty.", "one missed letter. Stick figure head is on the the hang pole.", "two missed letters. Stick figure head and body are on the hang pole.", "three missed letters. Stick figure head, body and right arm are on the hang pole.", "four missed letters. Stick figure head, body, and both arms are on the hang pole.", "five missed letters. Stick figure head, body, and both arms are on the hang pole.", "a hanged stick figure on the pole. Game Over, You Lose", "a free stick figure. You Won!"];
 
 	$("#hangmanImageWrapper").html('<img src="images/'+imageFiles[imageState]+'" alt="hang man pole image, with'+altMessages[imageState]+'"> ');
 }
@@ -348,14 +347,7 @@ function gameOver(winner, timeUpLoss) {
 
 	//create modal
 	$('<section id="gameOver"></section>').appendTo('body'); 
-	//set modal css
-	// $("#gameOver").css({
-		// "height": "200px",
-		// "width": "300px",
-		// "background-color": "red",
-		// "border": "1px solid black",
-	// 	"border-radius": "10px"
-	// }); 
+ 
 	//create html element to hold the game over message
 	$('<p id="overMessage"></p>').appendTo("#gameOver");
 
@@ -380,10 +372,10 @@ function gameOver(winner, timeUpLoss) {
 	} else {
 		if (timeUpLoss === true) {
 			//User Lost because they ran out of time
-			$("#overMessage").text("You loose. You ran out of time. You finsished in " + (60 - gameTimer) + " seconds, with " + usedLetterBank.length + " turns total, and missed " + missedCount + " time" + gameOverMessageMissedTimesGrammar + ", with" + gameOverMessageHintGrammar + " using a hint. Your score is: " + finalScore);
+			$("#overMessage").text("You lose. You ran out of time. You finsished in " + (60 - gameTimer) + " seconds, with " + usedLetterBank.length + " turns total, and missed " + missedCount + " time" + gameOverMessageMissedTimesGrammar + ", with" + gameOverMessageHintGrammar + " using a hint. Your score is: " + finalScore);
 		} else {
 			//The user lost because they had too many wrong guesses
-			$("#overMessage").text("You loose. You got too many wrong. You finsished in " + (60 - gameTimer) + " seconds, with " + usedLetterBank.length + " turns total, and missed " + missedCount + " time" + gameOverMessageMissedTimesGrammar + ", with" + gameOverMessageHintGrammar + " using a hint. Your score is: " + finalScore);
+			$("#overMessage").text("You lose. You got too many wrong. You finsished in " + (60 - gameTimer) + " seconds, with " + usedLetterBank.length + " turns total, and missed " + missedCount + " time" + gameOverMessageMissedTimesGrammar + ", with" + gameOverMessageHintGrammar + " using a hint. Your score is: " + finalScore);
 		}
 	}
 	//isNewHighScore finds out if it was a top score in the scoreboard function, returns boolean: true for top 3 score, false for not top score. Scoreboard function will generate a message for the user and let them enter their name if the user makes it to the top 3
@@ -420,7 +412,7 @@ function gameOver(winner, timeUpLoss) {
  * length of the word, which becomes a percent of 60, which coincides with what 6 
  * wrong guesses would give you... each wrong guess on a winning game get 10 points 
  * subtracted from the score. time on the clock is added to a winners score. Using 
- * a hint will subtract 30 from your score whether you win or loose. 
+ * a hint will subtract 30 from your score whether you win or lose. 
  * 
  *  @returns score (an integer value)
  */
@@ -439,7 +431,7 @@ function scoreGen(winner) {
 		//winners get extra points for time left on the game clock
 		score = gameTimer + 170 - (missedCount * 10 + hintScore);
 	} else {
-		//loosers get credit for the percentage of letters they got right
+		//losers get credit for the percentage of letters they got right
 		for (let i = 0; i < dashStringArray.length; i++) {
 			if (dashStringArray[i] === "_") {
 				dashCount++;
@@ -466,9 +458,7 @@ function scoreBoard(finalScore) {
 	
 	//score board has top 3 contenders so you automatically go in if you're one of the first 3 players
 	if (gameCount <= 3) { 
-		$("#gameOver").css({
-			"height": "300px"
-		});
+
 		//first game for user
 		if (gameCount == 1) { 
 			$("#highMessage").text("You're the first person to play, so by default, you have the high score. (and also the low score) Please enter your name!");
@@ -494,9 +484,7 @@ function scoreBoard(finalScore) {
 
 	//game count is higher than 3
 	} else if (finalScore > highScore[2].score) {
-		$("#gameOver").css({
-			"height": "300px"
-		});
+
 		//higher than the previous high score. Way to go
 		if (finalScore > highScore[0].score) {
 			$("#highMessage").text("Congratulations! You have the new high score!!!! Please enter your name!");
@@ -511,7 +499,7 @@ function scoreBoard(finalScore) {
 		$('<input type="text" id="scoreHolder" maxlength="16" placeholder="enter name here:">').appendTo("#gameOver");
 		return true;
 	} else {
-		$("#gameOver").css({ "height": "250px" });
+
 		$("#highMessage").text("You didn't make it to the score board. Better luck next time");
 		return false;
 	}
@@ -530,7 +518,7 @@ function grabName(theFinalScore, winner) {
 		//get rid of the third (lowest scoring) element if there are
 		highScore.splice(2, 1); 
 	}
-	//add the object consisting of the name, the score and the win/loose game status
+	//add the object consisting of the name, the score and the win/lose game status
 	highScore.push({
 		name: $("#scoreHolder").val(),
 		score: theFinalScore,
@@ -577,7 +565,7 @@ function disableButtons() {
 /**
  * Sorts high score objects according to thier score
  * 
- * @param {Object[]} toBeSorted is an array of objects holding user name, score and win/loose status
+ * @param {Object[]} toBeSorted is an array of objects holding user name, score and win/lose status
  * 
  * @returns {Object[]} 
  */

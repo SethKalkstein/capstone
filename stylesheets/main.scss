@@ -12,30 +12,104 @@
 body {
     width: 98%;
     position: relative;
+    padding: 5px;
+
+    @include mediaQuery($breakpoint1, $breakpoint2){
+        padding: 10px;
+    }
+    @include mediaQuery($breakpoint2 + 1px){
+        padding: 20px;
+    }
+}
+
+header {
+    text-align: center;
+    font-weight: bold;
+    h1 {
+        font-weight: bolder;
+        text-shadow: 1px 1px black;
+        color: antiquewhite;
+    }  
+        span {
+            display: none;
+        }
+    p:hover > span {
+        display: inline;    
+    }
+    @include mediaQuery($breakpoint1, $breakpoint2){
+             
+        span {
+            display: inline;
+        }
+        h1 {
+            font-size: 3em;
+            text-shadow: 3px 3px black;
+        }
+    }
+
+    @include mediaQuery($breakpoint2 + 1px){
+        h1{
+            text-shadow: 6px 4px black; 
+            font-size: 6em;
+        }
+        p{
+            font-size: 1.5em;
+        }
+        span {
+            display: inline;
+        }
+    }
 }
 
 #userInput{
     text-align: center;
     display: block;
+    margin: 5px;
 
     #letterHolder{
-        margin: 0 auto;
+        margin: 3px auto;
         display: block;
-        width: 20%;
-        font-size: 80px;
-        opacity: .25;
+        width: 40px;
+        font-size: 70px;
+        background-color: rgba(255, 255, 255, 0.25);   
+        color: rgb(0, 0, 46);
+        border: none;
+        border-radius: 25%;
     }
 
     #guess{
         background-color: blue;
         opacity: .75;
         color: white;
-        border-radius: 33%;
+        border-radius: 10px;
         border-color: darkblue;
-        width: 25%;
+        width: 80px;
         font-size: 25px;
         padding: 5px;
     }
+    @include mediaQuery($breakpoint1, $breakpoint2){
+        #letterHolder{
+            width: 60px;
+            font-size: 110px;
+        }
+        #guess{
+            width: 110px;
+            font-size: 35px;
+            padding: 0px;
+        }
+    }
+
+    @include mediaQuery($breakpoint2 + 1px){
+        #letterHolder{
+            width: 80px;
+            font-size: 150px;
+        }
+        #guess{
+            width: 150px;
+            font-size: 50px;
+            padding: 0px;
+        }
+    } 
 }
 
 #wordHolder{
@@ -43,46 +117,206 @@ body {
     font-size: 40px;
     margin: auto 0 0 0;
     padding: 5px;
-    // border: 1px solid red;
     font-weight: bolder;
     font-family: "Courier New", Courier, monospace;
     text-transform: uppercase;
+        
+    @include mediaQuery($breakpoint1, $breakpoint2){
+        font-weight: bolder;
+        font-size: 35px;
+        text-shadow: 1px 2px black;
+        text-align: left;
+    }
     @include mediaQuery($breakpoint2 + 1px){
         font-size: 50px;
-    }           
+    }
 }
+
 #timerArea {
     text-align: center;
-    margin: 0px;
+    margin: 5px;
+
+    h3 {
+        font-size: 30px;
+        padding: 10px;  
+    }
+
     #timer {
-        font-size: 90px;
+        font-size: 60px;
         padding: 0px;
+    }
+
+    @include mediaQuery($breakpoint1, $breakpoint2){
+        h3 {
+            font-size: 30px;
+  
+        } 
+        #timer {
+            font-size: 50px;
+            padding: 0px;
+        }
+    }
+
+    @include mediaQuery($breakpoint2 + 1px){
+        font-weight: bold;
+        h3 {
+            font-size: 40px;
+  
+        } 
+        #timer {
+            font-size: 60px;
+            padding: 0px;
+        }
     }
 }
 
 
 #usedLetters {
     text-align: center;
+    h3{
+        font-size: 35px;
+    }
     #used{
         text-transform: uppercase;
+        font-size: 25px;
+    }
+    @include mediaQuery($breakpoint1, $breakpoint2){
+        border-bottom: 1px solid black;
+        margin-bottom: 5px;
+        padding-bottom: 5px;
+        #used {
+            font-size: 30px;
+        }
+    }
+    @include mediaQuery($breakpoint2 + 1px){
+        margin-top: 30px;
+        h3 {
+            font-size: 40px;
+            text-decoration: underline;
+            padding-bottom: 5px;
+        }
+        #used {
+            font-size: 35px;
+            border-bottom: 1px solid black;
+            padding-bottom: 20px;
+        }
     }
 }
 
 #hintArea{
     text-align: center;
+    margin-top: 10px;
+
+    #hintButton{
+        background-color: blue;
+        opacity: .75;
+        color: white;
+        border-radius: 10px;
+        border-color: darkblue;
+        width: 80px;
+        font-size: 25px;
+        padding: 5px;
+    }
+    #hint {
+        font-size: 25px;
+    }
+    @include mediaQuery($breakpoint1, $breakpoint2){
+        margin-top: 20px;
+        border-bottom: 1px solid black;
+        margin-bottom: 30px;
+        #hintButton{
+            width: 110px;
+            font-size: 35px;
+            padding: 0px;
+        }
+        
+        #hint {
+            font-size: 25px;
+            padding: 10px;
+        }
+        
+    }
+
+    @include mediaQuery($breakpoint2 + 1px){
+
+        margin-top: 0px;
+        #hintButton{
+            width: 150px;
+            font-size: 50px;
+            padding: 0px;
+        }
+        #hint {
+            font-size: 35px;
+            padding: 15px;
+        }
+    }
 }
 
 #hangmanImageWrapper {
   img{
-      height: 400px;
+    display: block;
+    height: 300px;
+    margin-right: auto;
+    margin-left: auto;
+    
+    @include mediaQuery($breakpoint1, $breakpoint2){
+            height: 300px;
+            margin: 50px;
+    }
+
+    @include mediaQuery($breakpoint2 + 1px){
+        height: 450px;
+    }
   }
+
 }
 
 #winnerArea {
     text-align: center;
+    h3 {
+        font-weight: bold;
+        font-size: 30px;
+    }
     table {
         margin-left: auto;
         margin-right: auto;
+        border: 1px solid black;
+        border-collapse: collapse;
+        font-size: 23px;
+        text-align: left;
+        th {
+            border-bottom: 3px solid black;
+            border-right: 1px solid black;
+        }
+        td{
+            border: 1px solid black;
+        }
+    }
+
+
+    @include mediaQuery($breakpoint1, $breakpoint2){
+        h3{
+
+            font-size: 50px;
+        }
+        table {
+            font-size: 35px;
+            th {
+                border-bottom: 5px solid black;
+            }
+        }
+    }
+    @include mediaQuery($breakpoint2 + 1px){
+        h3{
+
+            font-size: 70px;
+        }
+        table {
+            font-size: 37px;
+            th {
+                border-bottom: 5px solid black;
+            }
+        }
     }
 }
 
@@ -93,11 +327,30 @@ body {
     right: 0;
     margin-left: auto;
     margin-right: auto;
-    background-color: lightgray;
-    opacity: .85;
-    border: 3px solid purple;
-    width: 50%;
-    height: 50%;
-    font-size: 2em;
+    background-color: rgba(214, 231, 212, 0.85);
+    border: 3px solid green;
+    width: 80%;
+    padding: 10px;
+    // height: 50%;
+    font-size: 1.6em;
     border-radius: 10px;
+    @include mediaQuery($breakpoint1, $breakpoint2){
+        font-size: 2em;
+        #scoreHolder{
+            font-size: 30px;
+        }
+        #newGame{
+            font-size: 25px;
+        }
+    }
+    @include mediaQuery($breakpoint2 + 1){
+        widows: 65%;
+        font-size: 3em;
+        #scoreHolder{
+            font-size: 40px;
+        }
+        #newGame{
+            font-size: 35px;
+        }
+    }
 }
