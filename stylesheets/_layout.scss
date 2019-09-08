@@ -1,0 +1,57 @@
+main {
+    display: grid;
+    grid-template-areas:
+    "input     timer"
+    "word       word"
+    "letters  letters"
+    "hint        hint"
+    "images     images"
+    "winners  winners";
+    grid-template-columns: 1fr 1fr; 
+
+    @include mediaQuery($breakpoint1, $breakpoint2){
+        grid-template-areas:
+        "input    timer    word"
+        "none     none    images"
+        "hint     hint   images"
+        "letters  letters  images"
+        "winners winners  winners";
+        grid-template-columns: 17% 17% 66%;
+    }
+
+    @include mediaQuery($breakpoint2 + 1px){
+        grid-template-areas:
+        "input  timer    word"
+        "input images letters"
+        "hint  images  winners";
+        grid-template-columns: 2fr 3fr 5fr;
+    }
+}
+
+#userInput {
+    grid-area: input;
+}
+
+#timerArea {
+    grid-area: timer;
+}
+
+#wordHolder {
+    grid-area: word;
+}
+
+#usedLetters {
+    grid-area: letters;
+}
+
+#hintArea {
+    grid-area: hint;
+}
+
+#hangmanImageWrapper {
+    grid-area: images;
+}
+
+#winnerArea {
+    grid-area: winners;
+}

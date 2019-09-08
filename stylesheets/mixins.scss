@@ -1,0 +1,12 @@
+@mixin mediaQuery($args...){
+    @if length($args) == 1{
+      @media screen and (min-width: nth($args, 1)){
+        @content;
+      }
+    }
+    @if length($args) == 2{
+      @media screen and (min-width: nth($args, 1)) and (max-width: nth($args, 2)){
+        @content;
+      }
+    }
+  }
